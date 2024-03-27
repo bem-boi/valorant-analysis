@@ -115,24 +115,23 @@ def read_game(game_data: TextIO) -> list[dict]:
     line = game_data.readline().strip().split(',')
     while line[0] != '':
         game = {}
+        matches = {}
         match_name = line[3]
+        match_map = line[4]
         team_a = line[5]
         team_b = line[10]
-        teama_attack_score = int(line[7])
-        teama_defend_score = int(line[8])
-        teamb_attack_score = int(line[12])
-        teamb_defend_score = int(line[13])
+        teama_attack = int(line[7])
+        teama_defend = int(line[8])
+        teamb_attack = int(line[12])
+        teamb_defend = int(line[13])
+        matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
 
         line = game_data.readline().strip().split(',')
         while line[3] == match_name:
-            teama_attack_score += int(line[7])
-            teama_defend_score += int(line[8])
-            teamb_attack_score += int(line[12])
-            teamb_defend_score += int(line[13])
+            match_map = line[4]
+            matches[match_map] = {line[5]: (line[7], line[8]), line[10]: (line[12], line[13])}
             line = game_data.readline().strip().split(',')
 
-        game[team_a] = (teama_attack_score, teama_defend_score)
-        game[team_b] = (teamb_attack_score, teamb_defend_score)
-
+        game[match_name] = matches
         info.append(game)
-        return info
+    return info
