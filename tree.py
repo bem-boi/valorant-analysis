@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Any, Optional, TextIO
 
 
 class Tree:
@@ -96,12 +96,43 @@ class Tree:
                 str_so_far += subtree._str_indented(depth + 1)
             return str_so_far
 
-    #functions that read data from file (returns list or dict or list of list?):
+    # functions that read data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
-    #function that takes in data (list or dict) and creates the tree
+    # function that takes in data (list or dict) and creates the tree
+
+    # then traverse the tree to get "most likely to win" stuff (figure that out later)
 
 
+def read_game(game_data: TextIO) -> list[dict]:
+    """
+    TODO: docstring
+    :param game_data:
+    :return:
+    """
+    info = []
+    game_data.readline()
+    line = game_data.readline().strip().split(',')
+    while line[0] != '':
+        game = {}
+        match_name = line[3]
+        team_a = line[5]
+        team_b = line[10]
+        teama_attack_score = int(line[7])
+        teama_defend_score = int(line[8])
+        teamb_attack_score = int(line[12])
+        teamb_defend_score = int(line[13])
 
+        line = game_data.readline().strip().split(',')
+        while line[3] == match_name:
+            teama_attack_score += int(line[7])
+            teama_defend_score += int(line[8])
+            teamb_attack_score += int(line[12])
+            teamb_defend_score += int(line[13])
+            line = game_data.readline().strip().split(',')
 
-    #then traverse the tree to get "most likely to win" stuff (figure that out later)
+        game[team_a] = (teama_attack_score, teama_defend_score)
+        game[team_b] = (teamb_attack_score, teamb_defend_score)
+
+        info.append(game)
+        return info
