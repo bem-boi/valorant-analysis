@@ -127,9 +127,9 @@ def read_game(game_data: TextIO) -> list[dict]:
         matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
 
         line = game_data.readline().strip().split(',')
-        while line[3] == match_name:
+        while line[0] != '' and line[3] == match_name:
             match_map = line[4]
-            matches[match_map] = {line[5]: (line[7], line[8]), line[10]: (line[12], line[13])}
+            matches[match_map] = {line[5]: (int(line[7]), int(line[8])), line[10]: int((line[12]), int(line[13]))}
             line = game_data.readline().strip().split(',')
 
         game[match_name] = matches
