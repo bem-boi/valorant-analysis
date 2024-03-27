@@ -49,3 +49,59 @@ class Tree:
             return 0
         else:
             return 1 + sum(subtree.__len__() for subtree in self._subtrees)
+
+    def __contains__(self, item: Any) -> bool:
+        """Return whether the given is in this tree.
+
+        >>> t = Tree(1, [Tree(2, []), Tree(5, [])])
+        >>> t.__contains__(1)
+        True
+        >>> t.__contains__(5)
+        True
+        >>> t.__contains__(4)
+        False
+        """
+        if self.is_empty():
+            return False
+        elif self._root == item:
+            return True
+        else:
+            for subtree in self._subtrees:
+                if subtree.__contains__(item):
+                    return True
+            return False
+
+    def __str__(self) -> str:
+        """Return a string representation of this tree.
+
+        For each node, its item is printed before any of its
+        descendants' items. The output is nicely indented.
+
+        You may find this method helpful for debugging.
+        """
+        return self._str_indented(0).rstrip()
+
+    def _str_indented(self, depth: int) -> str:
+        """Return an indented string representation of this tree.
+
+        The indentation level is specified by the <depth> parameter.
+        """
+        if self.is_empty():
+            return ''
+        else:
+            str_so_far = '  ' * depth + f'{self._root}\n'
+            for subtree in self._subtrees:
+                # Note that the 'depth' argument to the recursive call is
+                # modified.
+                str_so_far += subtree._str_indented(depth + 1)
+            return str_so_far
+
+    #functions that read data from file (returns list or dict or list of list?):
+    # teams, matches (with map as item??), defense or attack win
+
+    #function that takes in data (list or dict) and creates the tree
+
+
+
+
+    #then traverse the tree to get "most likely to win" stuff (figure that out later)
