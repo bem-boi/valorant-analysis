@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any
-
+import csv
 
 class _WeightedVertex:
     item: Any
@@ -138,31 +138,46 @@ def load_weighted_graph(agent_pick_rates: str, teams_picked_agent: str) -> Weigh
     """
 
 
-def combine_and_clean_agents_pick_files(files: list[str]) -> str:
+def clean_agents_pick_file(file: str) -> str:
     """
     Create a file and return its path that is of the following format:
         Map,Agent,Pick Rate
+    where pick rate is written as a decimal between 0 and 1 (eg. 0.16 to represent 16%)
 
-    Only select rows where Map in {'Ascent', 'Bind', 'Haven', 'Icebox', 'Split', Breeze'}
-    Get rows from every file referred to in files
+    Do not select rows where Map = 'All Maps'
 
     Precondition:
-        - each item in files is a path to a CSV file
-        - each CSV file being referred to has this same format:
+        - file is a path to a CSV file
+        - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Agent,Pick Rate
     """
+    with open('cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
+        writer = csv.writer(write_file)
+        writer.writerow(['Map', 'Agent', 'Pick Rate'])
+        with open(file, 'r') as read_file:
+            reader = csv.reader(read_file)
+            for row in reader:
+                if row[3] != 'All Maps' and row[3] != 'Map':
+                    writer.writerow([row[3], row[4], int(row[5][:-1])/100])
+    return 'cleaned_agents_pick_rates.csv'
 
 
-def combine_and_clean_teams_picked_agents_files(files: list[str]) -> str:
+def clean_teams_picked_agents_file(file: str) -> str:
     """
     Create a file and return its path that is of the following format:
         Map,Agent Picked,Total Wins By Map,Total Maps Played
 
-    Only select rows where Map in {'Ascent', 'Bind', 'Haven', 'Icebox', 'Split', Breeze'}
-    Get rows from every file referred to in files
-
     Precondition:
-        - each item in files is a path to a CSV file
-        - each CSV file being referred to has this same format:
+        - file is a path to a CSV file
+        - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Team,Agent Picked,Total Wins By Map,Total Loss By Map,Total Maps Played
     """
+    with open('cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
+        writer = csv.writer(write_file)
+        writer.writerow(['Map', 'Agent Picked', 'Total Wins By Map', 'Total Maps Played'])
+        with open(file, 'r') as read_file:
+            reader = csv.reader(read_file)
+            for row in reader:
+                if row[3] != 'Map':
+                    writer.writerow([row[3], row[4], row[5], row[7]])
+    return 'cleaned_teams_picked_agents.csv'
