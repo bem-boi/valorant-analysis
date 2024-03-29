@@ -126,4 +126,43 @@ class WeightedGraph:
                 break
 
         return graph_nx
-        
+
+
+def load_weighted_graph(agent_pick_rates: str, teams_picked_agent: str) -> WeightedGraph:
+    """
+    The weight of the edge (for an agent-map edge) is calculated by the following formula:
+        10 * ((Total Wins By Map) / (Total Maps Played) + Pick Rate)
+
+    This acts as a measure for how good an agent is for a particular map
+
+    """
+
+
+def combine_and_clean_agents_pick_files(files: list[str]) -> str:
+    """
+    Create a file and return its path that is of the following format:
+        Map,Agent,Pick Rate
+
+    Only select rows where Map in {'Ascent', 'Bind', 'Haven', 'Icebox', 'Split', Breeze'}
+    Get rows from every file referred to in files
+
+    Precondition:
+        - each item in files is a path to a CSV file
+        - each CSV file being referred to has this same format:
+            Tournament,Stage,Match Type,Map,Agent,Pick Rate
+    """
+
+
+def combine_and_clean_teams_picked_agents_files(files: list[str]) -> str:
+    """
+    Create a file and return its path that is of the following format:
+        Map,Agent Picked,Total Wins By Map,Total Maps Played
+
+    Only select rows where Map in {'Ascent', 'Bind', 'Haven', 'Icebox', 'Split', Breeze'}
+    Get rows from every file referred to in files
+
+    Precondition:
+        - each item in files is a path to a CSV file
+        - each CSV file being referred to has this same format:
+            Tournament,Stage,Match Type,Map,Team,Agent Picked,Total Wins By Map,Total Loss By Map,Total Maps Played
+    """
