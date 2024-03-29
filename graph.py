@@ -128,21 +128,65 @@ class WeightedGraph:
         return graph_nx
 
 
-def load_weighted_graph(agent_pick_rates: str, teams_picked_agent: str) -> WeightedGraph:
+def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str) -> dict[str, dict[str, tuple]]:
     """
-    The weight of the edge (for an agent-map edge) is calculated by the following formula:
-        10 * ((Total Wins By Map) / (Total Maps Played) + Pick Rate)
+    Return a dictionary where the keys are all the maps in the csv files (referred to by the arguments)
+    and where the values are dictionaries whose keys are all the agents in the csv files
+    and the values are tuples storing sum of pick rates, count of pick rates, total wins so far and total played so far.
 
-    This acts as a measure for how good an agent is for a particular map
-
+    In other words, the dictionary will be in the format {map_name: agent_ref}
+    where agent_ref is in the format {agent_name: (sum_pick_rate, count_pick_rate, total_wins, total_played)}
     """
+    map_ref = {} # {map_name: agent_ref} and agent_ref in format
+    # {agent_name: (sum_pick_rate_so_far, count_pick_rate_so_far, total_wins_so_far, total_played_so_far)}
+    with open(agent_pick_rates, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row[0] not in map_ref:  # if the map is not in map_ref
+                map_ref[row[0]] = {row[1]: (row[2], 1, 0, 0)}  # define new map in map_ref & create new agent_ref for it
+            elif row[1] not in map_ref[row[0]]:  # if the agent is not in the agent_ref of this map key
+                map_ref[row[0]][row[1]] = (row[2], 1, 0, 0)  # create a new agent_ref for it
+            else:  # the map is already in map_ref and the agent is already in its agent_ref
+                map_ref[row[0]][row[1]][0] += row[2]  # update sum_pick_rate_so_far
+                map_ref[row[0]][row[1]][1] += 1  # update count_pick_rate_so_far
+    with open(teams_picked_agent, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            map_ref[row[0]][row[1]][1] += row[2]  # update total_wins_so_far
+            map_ref[row[0]][row[1]][2] += row[3]  # update total_played_so_far
+    return map_ref
+
+
+def generate_weighted_graph(map_ref: dict[str, dict[str, tuple]]) -> WeightedGraph:
+    """
+    Return a weighted graph where:
+
+    - The vertices are the different maps and the agents in the csv files provided
+
+    - The weight of the edges (for agent-map edges) is calculated by the following formula:
+        10 * ((Total Wins By Map) / (Total Maps Played)) +  5 * Average Pick Rate
+      This acts as a measure for how good an agent is for a particular map (weight will be between 0 and 15)
+
+    Precondition:
+        - map_ref is in the format {map_name: agent_ref}
+        where agent_ref is in the format {agent_name: (sum_pick_rate, total_wins, total_played)}
+    """
+    g = WeightedGraph()
+    for map_name in map_ref:
+        g.add_vertex(map_name, 'map')
+        for agent_name in map_ref[map_name]:
+            g.add_vertex(agent_name, 'agent')
+            weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
+                      5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+            g.add_edge(map_name, agent_name, weight)
+    return WeightedGraph()
 
 
 def clean_agents_pick_file(file: str) -> str:
     """
     Create a file and return its path that is of the following format:
         Map,Agent,Pick Rate
-    where pick rate is written as a decimal between 0 and 1 (eg. 0.16 to represent 16%)
+    where pick rate is written as a decimal between 0 and 1 (e.g. 0.16 to represent 16%)
 
     Do not select rows where Map = 'All Maps'
 
