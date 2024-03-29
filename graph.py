@@ -2,12 +2,13 @@ from __future__ import annotations
 from typing import Any
 import csv
 
+
 class _WeightedVertex:
     item: Any
     kind: str
     neighbours: dict[_WeightedVertex, float]
 
-    def __init__(self, item: Any, neighbours : dict[_WeightedVertex, float], kind : str) -> None:
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], kind: str) -> None:
         """Initialize a new vertex with the given item and kind and neighbours.
 
         Preconditions:
@@ -128,56 +129,71 @@ class WeightedGraph:
         return graph_nx
 
 
-def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str) -> dict[str, dict[str, tuple]]:
+def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str) -> dict[str, dict[str, list]]:
     """
     Return a dictionary where the keys are all the maps in the csv files (referred to by the arguments)
     and where the values are dictionaries whose keys are all the agents in the csv files
-    and the values are tuples storing sum of pick rates, count of pick rates, total wins so far and total played so far.
+    and the values are lists storing sum of pick rates, count of pick rates, total wins so far and total played so far.
 
     In other words, the dictionary will be in the format {map_name: agent_ref}
-    where agent_ref is in the format {agent_name: (sum_pick_rate, count_pick_rate, total_wins, total_played)}
+    where agent_ref is in the format {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played]}
+
+    Preconditions:
+        - Each row in the csv referred to by agent_pick_rates is in the format:
+            [Map,Agent,Pick Rate]
+        - Each row in the csv referred to by teams_picked_agent is in the format:
+            [Map,Agent Picked,Total Wins By Map,Total Maps Played]
     """
-    map_ref = {} # {map_name: agent_ref} and agent_ref in format
-    # {agent_name: (sum_pick_rate_so_far, count_pick_rate_so_far, total_wins_so_far, total_played_so_far)}
+    map_ref = {}  # {map_name: agent_ref} and agent_ref in format
+    # {agent_name: [sum_pick_rate_so_far, count_pick_rate_so_far, total_wins_so_far, total_played_so_far]}
     with open(agent_pick_rates, 'r') as file:
+        next(file)
         reader = csv.reader(file)
         for row in reader:
             if row[0] not in map_ref:  # if the map is not in map_ref
-                map_ref[row[0]] = {row[1]: (row[2], 1, 0, 0)}  # define new map in map_ref & create new agent_ref for it
+                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0]}  # define new map in map_ref & new agent_ref for it
             elif row[1] not in map_ref[row[0]]:  # if the agent is not in the agent_ref of this map key
-                map_ref[row[0]][row[1]] = (row[2], 1, 0, 0)  # create a new agent_ref for it
+                map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0]  # create a new agent_ref for it
             else:  # the map is already in map_ref and the agent is already in its agent_ref
-                map_ref[row[0]][row[1]][0] += row[2]  # update sum_pick_rate_so_far
+                map_ref[row[0]][row[1]][0] += float(row[2])  # update sum_pick_rate_so_far
                 map_ref[row[0]][row[1]][1] += 1  # update count_pick_rate_so_far
     with open(teams_picked_agent, 'r') as file:
+        next(file)
         reader = csv.reader(file)
         for row in reader:
-            map_ref[row[0]][row[1]][1] += row[2]  # update total_wins_so_far
-            map_ref[row[0]][row[1]][2] += row[3]  # update total_played_so_far
+            map_ref[row[0]][row[1]][2] += int(row[2])  # update total_wins_so_far
+            map_ref[row[0]][row[1]][3] += int(row[3])  # update total_played_so_far
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, tuple]]) -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]]) -> WeightedGraph:
     """
     Return a weighted graph where:
 
     - The vertices are the different maps and the agents in the csv files provided
 
     - The weight of the edges (for agent-map edges) is calculated by the following formula:
-        10 * ((Total Wins By Map) / (Total Maps Played)) +  5 * Average Pick Rate
+        IF (Total Maps Played = 0 or Number of Times Picked = 0),
+            THEN 0
+        ELSE
+            10 * ((Total Wins By Map) / (Total Maps Played)) +  5 * (Sum Pick Rate Percentages / Number of Times Picked)
+
       This acts as a measure for how good an agent is for a particular map (weight will be between 0 and 15)
 
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
-        where agent_ref is in the format {agent_name: (sum_pick_rate, total_wins, total_played)}
+        where agent_ref is in the format {agent_name: [sum_pick_rate, total_wins, total_played]}
     """
     g = WeightedGraph()
     for map_name in map_ref:
         g.add_vertex(map_name, 'map')
         for agent_name in map_ref[map_name]:
             g.add_vertex(agent_name, 'agent')
-            weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
-                      5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+            if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
+                weight = 0
+            else:
+                weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
+                          5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
             g.add_edge(map_name, agent_name, weight)
     return WeightedGraph()
 
@@ -199,10 +215,11 @@ def clean_agents_pick_file(file: str) -> str:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent', 'Pick Rate'])
         with open(file, 'r') as read_file:
+            next(read_file)
             reader = csv.reader(read_file)
             for row in reader:
-                if row[3] != 'All Maps' and row[3] != 'Map':
-                    writer.writerow([row[3], row[4], int(row[5][:-1])/100])
+                if row[3] != 'All Maps':
+                    writer.writerow([row[3], row[4], int(row[5][:-1]) / 100])
     return 'cleaned_agents_pick_rates.csv'
 
 
@@ -220,8 +237,18 @@ def clean_teams_picked_agents_file(file: str) -> str:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent Picked', 'Total Wins By Map', 'Total Maps Played'])
         with open(file, 'r') as read_file:
+            next(read_file)
             reader = csv.reader(read_file)
             for row in reader:
-                if row[3] != 'Map':
-                    writer.writerow([row[3], row[4], row[5], row[7]])
+                writer.writerow([row[3], row[5], row[6], row[8]])
     return 'cleaned_teams_picked_agents.csv'
+
+
+# ---MAIN---
+
+# cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
+# cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+#
+# map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file)
+# map_agent_graph = generate_weighted_graph(map_agent_data)
+
