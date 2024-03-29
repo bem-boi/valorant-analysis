@@ -3,7 +3,7 @@ from typing import Any, Optional, TextIO
 
 
 class Tree:
-    """A recursive tree data structure.
+    """A recursive tree graph_data structure.
 
     Representation Invariants:
         - self._root is not None or self._subtrees == []
@@ -96,10 +96,10 @@ class Tree:
                 str_so_far += subtree._str_indented(depth + 1)
             return str_so_far
 
-    # functions that read data from file (returns list or dict or list of list?):
+    # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
-    # function that takes in data (list or dict) and creates the tree
+    # function that takes in graph_data (list or dict) and creates the tree
 
     # then traverse the tree to get "most likely to win" stuff (figure that out later)
 

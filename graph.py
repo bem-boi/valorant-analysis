@@ -2,24 +2,28 @@ from __future__ import annotations
 from typing import Any
 
 
-class _Vertex:
-    """A vertex in a graph.
-
-    Instance Attributes:
-        - item: The data stored in this vertex.
-        - neighbours: The vertices that are adjacent to this vertex.
-    """
+class _WeightedVertex:
     item: Any
-    neighbours: set[_Vertex]
+    kind: str
+    neighbours: dict[_WeightedVertex, float]
 
-    def __init__(self, item: Any, neighbours: set[_Vertex]) -> None:
-        """Initialize a new vertex with the given item and neighbours."""
+    def __init__(self, item: Any, neighbours : dict[_WeightedVertex, float], kind : str) -> None:
+        """Initialize a new vertex with the given item and kind and neighbours.
+
+        Preconditions:
+            - kind in {'map', 'agent'}
+        """
         self.item = item
         self.neighbours = neighbours
+        self.kind = kind
+
+    def degree(self) -> int:
+        """Return the degree of this vertex."""
+        return len(self.neighbours)
 
 
-class Graph:
-    """A graph.
+class WeightedGraph:
+    """A weighted graph.
 
     Representation Invariants:
     - all(item == self._vertices[item].item for item in self._vertices)
@@ -27,13 +31,13 @@ class Graph:
     # Private Instance Attributes:
     #     - _vertices: A collection of the vertices contained in this graph.
     #                  Maps item to _Vertex instance.
-    _vertices: dict[Any, _Vertex]
+    _vertices: dict[Any, _WeightedVertex]
 
     def __init__(self) -> None:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any) -> None:
+    def add_vertex(self, item: Any, kind: str) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -41,9 +45,9 @@ class Graph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _Vertex(item, set())
+        self._vertices[item] = _WeightedVertex(item, {}, kind)
 
-    def add_edge(self, item1: Any, item2: Any) -> None:
+    def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
 
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
@@ -56,11 +60,23 @@ class Graph:
             v2 = self._vertices[item2]
 
             # Add the new edge
-            v1.neighbours.add(v2)
-            v2.neighbours.add(v1)
+            v1.neighbours[v2] = weight
+            v2.neighbours[v1] = weight
         else:
             # We didn't find an existing vertex for both items.
             raise ValueError
+
+    def get_weight(self, item1: Any, item2: Any) -> Union[int, float]:
+        """Return the weight of the edge between the given items.
+
+        Return 0 if item1 and item2 are not adjacent.
+
+        Preconditions:
+            - item1 and item2 are vertices in this graph
+        """
+        v1 = self._vertices[item1]
+        v2 = self._vertices[item2]
+        return v1.neighbours.get(v2, 0)
 
     def adjacent(self, item1: Any, item2: Any) -> bool:
         """Return whether item1 and item2 are adjacent vertices in this graph.
@@ -87,4 +103,27 @@ class Graph:
         else:
             raise ValueError
 
+    def to_networkx(self, max_vertices: int = 5000) -> nx.Graph:
+        """Convert this graph into a networkx Graph.
+
+        max_vertices specifies the maximum number of vertices that can appear in the graph.
+        (This is necessary to limit the visualization output for large graphs.)
+
+        Note that this method is provided for you, and you shouldn't change it.
+        """
+        graph_nx = nx.Graph()
+        for v in self._vertices.values():
+            graph_nx.add_node(v.item, kind=v.kind)
+
+            for u in v.neighbours.keys():
+                if graph_nx.number_of_nodes() < max_vertices:
+                    graph_nx.add_node(u.item, kind=u.kind)
+
+                if u.item in graph_nx.nodes:
+                    graph_nx.add_edge(v.item, u.item, weight=v.neighbours[u])
+
+            if graph_nx.number_of_nodes() >= max_vertices:
+                break
+
+        return graph_nx
         
