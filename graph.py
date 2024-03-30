@@ -224,7 +224,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = 'Al
                     weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
                               5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
                 g.add_edge(map_name, agent_name, weight)
-    return WeightedGraph()
+    return g
 
 
 def clean_agents_pick_file(file: str) -> str:
@@ -313,3 +313,4 @@ if __name__ == '__main__':
 
     agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
     # that the user should play on that map
+    print(agents_to_play)
