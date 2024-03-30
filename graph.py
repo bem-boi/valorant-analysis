@@ -129,15 +129,30 @@ class WeightedGraph:
 
         return graph_nx
 
+def load_agent_role_data(agent_role: str) -> dict[str: str]:
+    """
 
-def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str) -> dict[str, dict[str, list]]:
+    :param agent_role: file where the data of agents and their roles are kept
+    :return: returns a dictionary of the agents and their roles
+    """
+    agent = {}
+    with open(agent_role, 'r') as file:
+        next(file)
+        reader = csv.reader(file)
+        for row in reader:
+            agent[row[0]] = row[1]
+    return agent
+
+
+def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_role: dict) -> dict[str, dict[str, list]]:
     """
     Return a dictionary where the keys are all the maps in the csv files (referred to by the arguments)
     and where the values are dictionaries whose keys are all the agents in the csv files
     and the values are lists storing sum of pick rates, count of pick rates, total wins so far and total played so far.
 
     In other words, the dictionary will be in the format {map_name: agent_ref}
-    where agent_ref is in the format {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played]}
+    where agent_ref is in the format
+    {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played, role]}
 
     Preconditions:
         - Each row in the csv referred to by agent_pick_rates is in the format:
@@ -152,9 +167,9 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str) -> dict[
         reader = csv.reader(file)
         for row in reader:
             if row[0] not in map_ref:  # if the map is not in map_ref
-                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0]}  # define new map in map_ref & new agent_ref for it
+                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0, agent_role[row[1]]]}  # define new map in map_ref & new agent_ref for it
             elif row[1] not in map_ref[row[0]]:  # if the agent is not in the agent_ref of this map key
-                map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0]  # create a new agent_ref for it
+                map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0, agent_role[row[1]]]  # create a new agent_ref for it
             else:  # the map is already in map_ref and the agent is already in its agent_ref
                 map_ref[row[0]][row[1]][0] += float(row[2])  # update sum_pick_rate_so_far
                 map_ref[row[0]][row[1]][1] += 1  # update count_pick_rate_so_far
@@ -244,6 +259,15 @@ def clean_teams_picked_agents_file(file: str) -> str:
                 writer.writerow([row[3], row[5], row[6], row[8]])
     return 'cleaned_teams_picked_agents.csv'
 
+def best_agent_for_map(graph: WeightedGraph, current_map: str) -> WeightedGraph:
+    """
+
+    :param graph: Weighted graph where all the data is being held
+    :param current_map: the current map being played (input from user)
+    :return: returns a weighed graph where it's centered at the map
+    """
+
+
 
 # ---MAIN---
 if __name__ == '__main__':
@@ -253,3 +277,4 @@ if __name__ == '__main__':
     map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file)
     map_agent_graph = generate_weighted_graph(map_agent_data)
 
+    current_map = input("What map are you playing?")
