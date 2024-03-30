@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any
 import csv
+import networkx as nx
 
 
 class _WeightedVertex:
@@ -246,9 +247,9 @@ def clean_teams_picked_agents_file(file: str) -> str:
 
 # ---MAIN---
 
-# cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
-# cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
-#
-# map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file)
-# map_agent_graph = generate_weighted_graph(map_agent_data)
+cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
+cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+
+map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file)
+map_agent_graph = generate_weighted_graph(map_agent_data)
 

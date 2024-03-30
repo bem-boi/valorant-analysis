@@ -23,7 +23,7 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
 
-import ex4_part2
+import graph as graph_file
 
 # Colours to use when visualizing different clusters.
 COLOUR_SCHEME = [
@@ -39,7 +39,7 @@ BOOK_COLOUR = 'rgb(89, 205, 105)'
 USER_COLOUR = 'rgb(105, 89, 205)'
 
 
-def setup_graph(graph: ex4_part2.Graph,
+def setup_graph(graph: graph_file.WeightedGraph,
                 layout: str = 'spring_layout',
                 max_vertices: int = 5000,
                 weighted: bool = False) -> list:
@@ -104,7 +104,7 @@ def setup_graph(graph: ex4_part2.Graph,
         return data
 
 
-def visualize_graph(graph: ex4_part2.Graph,
+def visualize_graph(graph: graph_file.WeightedGraph,
                     layout: str = 'spring_layout',
                     max_vertices: int = 5000,
                     output_file: str = '') -> None:
@@ -120,7 +120,7 @@ def visualize_graph(graph: ex4_part2.Graph,
     draw_graph(setup_graph(graph, layout, max_vertices), output_file)
 
 
-def visualize_weighted_graph(graph: ex4_part2.WeightedGraph,
+def visualize_weighted_graph(graph: graph_file.WeightedGraph,
                              layout: str = 'spring_layout',
                              max_vertices: int = 5000,
                              output_file: str = '') -> None:
