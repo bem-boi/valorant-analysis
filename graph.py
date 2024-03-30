@@ -151,7 +151,7 @@ def load_agent_role_data(agent_role: str) -> dict[str: str]:
         next(file)
         reader = csv.reader(file)
         for row in reader:
-            agent[row[0]] = row[1]
+            agent[row[0].lower()] = row[1].lower()
     return agent
 
 
@@ -193,7 +193,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_role: dict[str: str]) -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = 'All') -> WeightedGraph:
     """
     Return a weighted graph where:
 
@@ -210,18 +210,20 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_role: dic
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
         where agent_ref is in the format {agent_name: [sum_pick_rate, total_wins, total_played]}
+        - role in agent_role.values()
     """
     g = WeightedGraph()
     for map_name in map_ref:
         g.add_vertex(map_name, 'map')
         for agent_name in map_ref[map_name]:
-            g.add_vertex(agent_name, 'agent', agent_role[agent_name])
-            if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
-                weight = 0
-            else:
-                weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
-                          5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
-            g.add_edge(map_name, agent_name, weight)
+            if role == 'All' or map_ref[map_name][agent_name][4] == role:
+                g.add_vertex(agent_name, 'agent', map_ref[map_name][agent_name][4])
+                if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
+                    weight = 0
+                else:
+                    weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
+                              5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+                g.add_edge(map_name, agent_name, weight)
     return WeightedGraph()
 
 
@@ -246,7 +248,7 @@ def clean_agents_pick_file(file: str) -> str:
             reader = csv.reader(read_file)
             for row in reader:
                 if row[3] != 'All Maps':
-                    writer.writerow([row[3], row[4], int(row[5][:-1]) / 100])
+                    writer.writerow([row[3].lower(), row[4], int(row[5][:-1]) / 100])
     return 'cleaned_agents_pick_rates.csv'
 
 
@@ -267,7 +269,7 @@ def clean_teams_picked_agents_file(file: str) -> str:
             next(read_file)
             reader = csv.reader(read_file)
             for row in reader:
-                writer.writerow([row[3], row[5], row[6], row[8]])
+                writer.writerow([row[3].lower(), row[5], row[6], row[8]])
     return 'cleaned_teams_picked_agents.csv'
 
 
@@ -299,15 +301,15 @@ if __name__ == '__main__':
     map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
     map_agent_graph = generate_weighted_graph(map_agent_data, agent_role_data)
 
-    current_map = input("What map are you playing?")
-    favored_role = input("What role do you want to play? Press ENTER if you have no preference")  # pressing enter
-    # would make it None type
-    teammate_ask = input("What agents are your teammates playing? Type 'NO' if you don't want it to be considered. "
-                         "Otherwise type 'YES'. ")
+    current_map = input("What map are you playing?").lower()
+    favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
+    # enter would make it None type
+    teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
+                         "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
     teammate_data = []
     if teammate_ask == 'YES':
         for i in range(4):
-            teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?"))
+            teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?").lower())
 
     agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
     # that the user should play on that map
