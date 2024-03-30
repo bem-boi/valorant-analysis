@@ -129,6 +129,7 @@ class WeightedGraph:
 
         return graph_nx
 
+
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
 
@@ -259,14 +260,25 @@ def clean_teams_picked_agents_file(file: str) -> str:
                 writer.writerow([row[3], row[5], row[6], row[8]])
     return 'cleaned_teams_picked_agents.csv'
 
-def best_agent_for_map(graph: WeightedGraph, current_map: str) -> WeightedGraph:
+
+def best_agent_for_map(graph: WeightedGraph, map_played: str, role: str, teammate=None) -> dict[str: float]:
     """
 
+    :param role: role the player wants to play
+    :param teammate: what agents are your teammates playing
     :param graph: Weighted graph where all the data is being held
-    :param current_map: the current map being played (input from user)
-    :return: returns a weighed graph where it's centered at the map
+    :param map_played: the current map being played (input from user)
+    :return: returns a dictionary of agents and the score from 0-15 of how good the agent is for that map
     """
+    if teammate is None:
+        teammate = []
+    agent_and_score = {}
+    for agent in graph.get_neighbours(map_played):
+        if agent not in teammate:
+            agent_and_score[agent] = graph.get_weight(agent, map_played)
 
+    sorted_agent_and_score = dict(sorted(agent_and_score.items(), key=lambda item: item[1], reverse=True))
+    return sorted_agent_and_score
 
 
 # ---MAIN---
@@ -278,3 +290,10 @@ if __name__ == '__main__':
     map_agent_graph = generate_weighted_graph(map_agent_data)
 
     current_map = input("What map are you playing?")
+    favored_role = input("What role do you want to play?")
+    teammate_ask = input("What agents are your teammates playing? Type 'NO' if you don't want it to be considered. "
+                         "Otherwise type 'YES'. ")
+    teammate_data = []
+    if teammate_ask == 'YES':
+        for i in range(4):
+            teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?"))
