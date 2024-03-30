@@ -299,7 +299,7 @@ if __name__ == '__main__':
     agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
 
     map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
-    map_agent_graph = generate_weighted_graph(map_agent_data, agent_role_data)
+    map_agent_graph = generate_weighted_graph(map_agent_data)
 
     current_map = input("What map are you playing?").lower()
     favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
