@@ -8,8 +8,9 @@ class _WeightedVertex:
     item: Any
     kind: str
     neighbours: dict[_WeightedVertex, float]
+    role: str
 
-    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], kind: str) -> None:
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], kind: str, role: str = None) -> None:
         """Initialize a new vertex with the given item and kind and neighbours.
 
         Preconditions:
@@ -18,6 +19,7 @@ class _WeightedVertex:
         self.item = item
         self.neighbours = neighbours
         self.kind = kind
+        self.role = role
 
     def degree(self) -> int:
         """Return the degree of this vertex."""
@@ -39,7 +41,7 @@ class WeightedGraph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, kind: str) -> None:
+    def add_vertex(self, item: Any, kind: str, role: str = None) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -47,7 +49,7 @@ class WeightedGraph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _WeightedVertex(item, {}, kind)
+        self._vertices[item] = _WeightedVertex(item, {}, kind, role)
 
     def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -104,6 +106,14 @@ class WeightedGraph:
             return {neighbour.item for neighbour in v.neighbours}
         else:
             raise ValueError
+
+    def get_vertex(self, item: Any) -> _WeightedVertex:
+        """
+
+        :param item:
+        :return:
+        """
+        return self._vertices[item]
 
     def to_networkx(self, max_vertices: int = 5000) -> nx.Graph:
         """Convert this graph into a networkx Graph.
@@ -183,7 +193,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, list]]) -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_role: dict[str: str]) -> WeightedGraph:
     """
     Return a weighted graph where:
 
@@ -205,7 +215,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]]) -> WeightedGrap
     for map_name in map_ref:
         g.add_vertex(map_name, 'map')
         for agent_name in map_ref[map_name]:
-            g.add_vertex(agent_name, 'agent')
+            g.add_vertex(agent_name, 'agent', agent_role[agent_name])
             if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
                 weight = 0
             else:
@@ -261,7 +271,7 @@ def clean_teams_picked_agents_file(file: str) -> str:
     return 'cleaned_teams_picked_agents.csv'
 
 
-def best_agent_for_map(graph: WeightedGraph, map_played: str, role: str, teammate=None) -> dict[str: float]:
+def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, role: str = None) -> dict[str: float]:
     """
 
     :param role: role the player wants to play
@@ -270,11 +280,10 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, role: str, teammat
     :param map_played: the current map being played (input from user)
     :return: returns a dictionary of agents and the score from 0-15 of how good the agent is for that map
     """
-    if teammate is None:
-        teammate = []
+
     agent_and_score = {}
     for agent in graph.get_neighbours(map_played):
-        if agent not in teammate:
+        if agent not in teammate and graph.get_vertex(agent).role == role:
             agent_and_score[agent] = graph.get_weight(agent, map_played)
 
     sorted_agent_and_score = dict(sorted(agent_and_score.items(), key=lambda item: item[1], reverse=True))
@@ -285,15 +294,20 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, role: str, teammat
 if __name__ == '__main__':
     cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
     cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+    agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
 
-    map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file)
-    map_agent_graph = generate_weighted_graph(map_agent_data)
+    map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
+    map_agent_graph = generate_weighted_graph(map_agent_data, agent_role_data)
 
     current_map = input("What map are you playing?")
-    favored_role = input("What role do you want to play?")
+    favored_role = input("What role do you want to play? Press ENTER if you have no preference")  # pressing enter
+    # would make it None type
     teammate_ask = input("What agents are your teammates playing? Type 'NO' if you don't want it to be considered. "
                          "Otherwise type 'YES'. ")
     teammate_data = []
     if teammate_ask == 'YES':
         for i in range(4):
             teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?"))
+
+    agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
+    # that the user should play on that map
