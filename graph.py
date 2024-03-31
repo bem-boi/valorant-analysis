@@ -317,7 +317,21 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
     return sorted_agent_and_score
 
 
-def visualize_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
+def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
+    """
+    Visualize the graph g
+    If file_name is given, save the visualization in a file with name file_name after visualizing
+    :param g:
+    :param file_name:
+    :return:
+    """
+    from visualization import visualize_weighted_graph
+    visualize_weighted_graph(g)
+    if file_name:
+        visualize_weighted_graph(g, output_file=file_name)
+
+
+def visualize_agent_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
     """
     Visualize a graph of agents of type role only and maps.
     If role is an empty string, then visualize graphs for all roles
