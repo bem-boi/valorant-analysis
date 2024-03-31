@@ -141,3 +141,46 @@ def read_game(game_data: TextIO) -> list[dict]:
         game[match_name] = matches
         info.append(game)
     return info
+
+
+def read_buy_type(eco_data: TextIO) -> list[dict]:
+    """
+    TODO: docstring
+    :param eco_data:
+    :return:
+    """
+    info = []
+    eco_data.readline()
+    line = eco_data.readline().strip().split(',')
+    while line[0] != '':
+        game = {}
+        matches = {}
+        match_name = line[3]
+        match_map = line[4]
+        round_num = int(line[5])
+
+        outcome = line[10]
+        if outcome == 'loss':
+            line = eco_data.readline().strip().split(',')
+        winning_team = line[6]
+        type_buy = line[9]
+
+        matches[match_map] = {round_num: (winning_team, type_buy)}
+
+        line = eco_data.readline().strip().split(',')
+        while line[0] != '' and line[3] == match_name:
+            while line[0] != '' and line[4] == match_map:
+                if line[10] == 'loss':
+                    line = eco_data.readline().strip().split(',')
+                matches[match_map][int(line[5])] = (line[6], line[9])
+                line = eco_data.readline().strip().split(',')
+            match_map = line[4]
+            if line[10] == 'loss':
+                line = eco_data.readline().strip().split(',')
+            matches[match_map] = {int(line[5]): (line[6], line[9])}
+            line = eco_data.readline().strip().split(',')
+
+        game[match_name] = matches
+        info.append(game)
+
+    return info
