@@ -164,7 +164,7 @@ def load_agent_role_data(agent_role: str) -> dict[str: str]:
     return agent
 
 
-def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_role: dict) -> dict[str, dict[str, list]]:
+def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_roles: dict) -> dict[str, dict[str, list]]:
     """
     Return a dictionary where the keys are all the maps in the csv files (referred to by the arguments)
     and where the values are dictionaries whose keys are all the agents in the csv files
@@ -187,9 +187,9 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
         reader = csv.reader(file)
         for row in reader:
             if row[0] not in map_ref:  # if the map is not in map_ref
-                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0, agent_role[row[1]]]}  # define new map in map_ref & new agent_ref for it
+                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0, agent_roles[row[1]]]}  # define new map in map_ref & new agent_ref for it
             elif row[1] not in map_ref[row[0]]:  # if the agent is not in the agent_ref of this map key
-                map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0, agent_role[row[1]]]  # create a new agent_ref for it
+                map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0, agent_roles[row[1]]]  # create a new agent_ref for it
             else:  # the map is already in map_ref and the agent is already in its agent_ref
                 map_ref[row[0]][row[1]][0] += float(row[2])  # update sum_pick_rate_so_far
                 map_ref[row[0]][row[1]][1] += 1  # update count_pick_rate_so_far
@@ -303,6 +303,25 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
     return sorted_agent_and_score
 
 
+def visualize_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
+    """
+    Visualize a graph of agents of type role only and maps.
+    If role is an empty string, then visualize graphs for all roles
+    :param agents_roles:
+    :param map_ref:
+    :param role:
+    :return:
+    """
+    from visualization import visualize_weighted_graph
+    if role:
+        g = generate_weighted_graph(map_ref, role)
+        visualize_weighted_graph(g)
+    else:
+        for role in set(agents_roles.values()):
+            g = generate_weighted_graph(map_ref, role)
+            visualize_weighted_graph(g)
+
+
 # ---MAIN---
 if __name__ == '__main__':
     cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
@@ -312,16 +331,18 @@ if __name__ == '__main__':
     map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
     map_agent_graph = generate_weighted_graph(map_agent_data)
 
-    current_map = input("What map are you playing?").lower()
-    favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
-    # enter would make it '' type
-    teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
-                         "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
-    teammate_data = []
-    if teammate_ask == 'YES':
-        for i in range(4):
-            teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?").lower())
+    # current_map = input("What map are you playing?").lower()
+    # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
+    # # enter would make it '' type
+    # teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
+    #                      "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
+    # teammate_data = []
+    # if teammate_ask == 'YES':
+    #     for i in range(4):
+    #         teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?").lower())
+    #
+    # agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
+    # # that the user should play on that map
+    # print(agents_to_play)
 
-    agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
-    # that the user should play on that map
-    print(agents_to_play)
+    # visualize_graph(agent_role_data, map_agent_data, '')
