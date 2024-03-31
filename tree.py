@@ -170,66 +170,24 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
 
         line = eco_data.readline().strip().split(',')
         while line[0] != '' and line[3] == match_name:
-            while line[0] != '' and line[4] == match_map:
+            match_map = line[4]
+            if match_map in matches:
                 if line[10] == 'loss':
                     line = eco_data.readline().strip().split(',')
                     matches[match_map][int(line[5])] = (line[6], line[9])
                 else:
                     matches[match_map][int(line[5])] = (line[6], line[9])
                     eco_data.readline().strip().split(',')
-                line = eco_data.readline().strip().split(',')
-            match_map = line[4]
-            if line[10] == 'loss':
-                line = eco_data.readline().strip().split(',')
-                matches[match_map] = {int(line[5]): (line[6], line[9])}
             else:
-                matches[match_map] = {int(line[5]): (line[6], line[9])}
-                eco_data.readline().strip().split(',')
+                if line[10] == 'loss':
+                    line = eco_data.readline().strip().split(',')
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                else:
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                    eco_data.readline().strip().split(',')
             line = eco_data.readline().strip().split(',')
 
         game[match_name] = matches
         info.append(game)
 
     return info
-
-# Tournament,Stage,Match Type,Match Name,Map,Round Number,Team,Loadout Value,Remaining Credits,Type,Outcome
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,1,Vision Strikers,3.9k,0.4k,Eco: 0-5k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,1,FULL SENSE,3.4k,0.2k,Eco: 0-5k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,2,Vision Strikers,14.4k,5.2k,Semi-buy: 10-20k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,2,FULL SENSE,2.4k,8.4k,Eco: 0-5k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,3,Vision Strikers,17.6k,15.2k,Semi-buy: 10-20k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,3,FULL SENSE,19.9k,0.9k,Semi-buy: 10-20k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,4,Vision Strikers,22.6k,4.7k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,4,FULL SENSE,21.7k,9.0k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,5,Vision Strikers,22.0k,4.2k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,5,FULL SENSE,10.0k,10.2k,Semi-buy: 10-20k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,6,Vision Strikers,23.0k,17.1k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,6,FULL SENSE,21.9k,2.0k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,7,Vision Strikers,22.6k,5.5k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,7,FULL SENSE,21.3k,7.4k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,8,Vision Strikers,22.0k,4.9k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,8,FULL SENSE,8.1k,10.3k,Semi-eco: 5-10k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,9,Vision Strikers,23.1k,11.2k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,9,FULL SENSE,21.6k,1.4k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,10,Vision Strikers,22.6k,16.9k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,10,FULL SENSE,14.3k,6.8k,Semi-buy: 10-20k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,1,Vision Strikers,3.6k,0.5k,Eco: 0-5k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,1,FULL SENSE,3.9k,0.1k,Eco: 0-5k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,2,Vision Strikers,14.0k,5.5k,Semi-buy: 10-20k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,2,FULL SENSE,2.3k,8.0k,Eco: 0-5k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,3,Vision Strikers,19.5k,14.8k,Semi-buy: 10-20k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,3,FULL SENSE,20.3k,0.2k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,4,Vision Strikers,23.5k,3.7k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,4,FULL SENSE,19.7k,5.0k,Semi-buy: 10-20k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,5,Vision Strikers,24.3k,15.5k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,5,FULL SENSE,7.9k,10.3k,Semi-eco: 5-10k,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,6,Vision Strikers,25.4k,18.4k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,6,FULL SENSE,21.8k,1.8k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,7,Vision Strikers,24.5k,29.7k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,7,FULL SENSE,13.3k,5.9k,Semi-buy: 10-20k,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,8,Vision Strikers,22.9k,18.1k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,8,FULL SENSE,24.9k,12.9k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,9,Vision Strikers,24.6k,27.6k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,9,FULL SENSE,24.6k,4.9k,Full buy: 20k+,Loss
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,10,Vision Strikers,24.6k,27.6k,Full buy: 20k+,Win
-# Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,10,FULL SENSE,10.7k,8.2k,Semi-buy: 10-20k,Loss
