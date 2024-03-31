@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Union
 import csv
 import networkx as nx
+from plotly.graph_objs import Figure
 
 
 class _WeightedVertex:
@@ -319,6 +320,26 @@ def visualize_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
         for role in set(agents_roles.values()):
             g = generate_weighted_graph(map_ref, role)
             visualize_weighted_graph(g)
+
+
+def return_graph(agents_roles: dict, map_ref: dict, role: str = '') -> Union[Figure, list]:
+    """
+
+    :param agents_roles:
+    :param map_ref:
+    :param role:
+    :return:
+    """
+    from visualization import return_weighted_graph
+    if role:
+        g = generate_weighted_graph(map_ref, role)
+        return return_weighted_graph(g)
+    else:
+        lst_graph = []
+        for role in set(agents_roles.values()):
+            g = generate_weighted_graph(map_ref, role)
+            lst_graph.append(return_weighted_graph(g))
+        return lst_graph
 
 
 # ---MAIN---
