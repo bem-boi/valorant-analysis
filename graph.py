@@ -250,7 +250,7 @@ def clean_agents_pick_file(file: str) -> str:
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Agent,Pick Rate
     """
-    with open('cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
+    with open('../../../Library/Application Support/JetBrains/PyCharmCE2023.3/scratches/cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent', 'Pick Rate'])
         with open(file, 'r') as read_file:
@@ -272,7 +272,8 @@ def clean_teams_picked_agents_file(file: str) -> str:
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Team,Agent Picked,Total Wins By Map,Total Loss By Map,Total Maps Played
     """
-    with open('cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
+    with open(
+            '../../../Library/Application Support/JetBrains/PyCharmCE2023.3/scratches/cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent Picked', 'Total Wins By Map', 'Total Maps Played'])
         with open(file, 'r') as read_file:
