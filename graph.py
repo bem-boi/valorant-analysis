@@ -233,7 +233,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = Non
                 else:
                     weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
                               5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
-                g.add_edge(map_name, agent_name, weight)
+                g.add_edge(map_name, agent_name, round(weight, 2))
     return g
 
 
@@ -250,7 +250,7 @@ def clean_agents_pick_file(file: str) -> str:
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Agent,Pick Rate
     """
-    with open('../../../Library/Application Support/JetBrains/PyCharmCE2023.3/scratches/cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
+    with open('cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent', 'Pick Rate'])
         with open(file, 'r') as read_file:
@@ -272,8 +272,7 @@ def clean_teams_picked_agents_file(file: str) -> str:
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Team,Agent Picked,Total Wins By Map,Total Loss By Map,Total Maps Played
     """
-    with open(
-            '../../../Library/Application Support/JetBrains/PyCharmCE2023.3/scratches/cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
+    with open('cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent Picked', 'Total Wins By Map', 'Total Maps Played'])
         with open(file, 'r') as read_file:
