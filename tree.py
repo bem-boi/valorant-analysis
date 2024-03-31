@@ -124,12 +124,9 @@ def read_game(game_data: TextIO) -> list[dict]:
         matches = {}
         match_name = line[3]
         match_map = line[4]
-        team_a = line[5]
-        team_b = line[10]
-        teama_attack = int(line[7])
-        teama_defend = int(line[8])
-        teamb_attack = int(line[12])
-        teamb_defend = int(line[13])
+        team_a, team_b = line[5], line[10]
+        teama_attack, teama_defend = int(line[7]), int(line[8])
+        teamb_attack, teamb_defend = int(line[12]), int(line[13])
         matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
 
         line = game_data.readline().strip().split(',')
@@ -162,22 +159,32 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
         outcome = line[10]
         if outcome == 'loss':
             line = eco_data.readline().strip().split(',')
-        winning_team = line[6]
-        type_buy = line[9]
-
-        matches[match_map] = {round_num: (winning_team, type_buy)}
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+        else:
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+            eco_data.readline().strip().split(',')
 
         line = eco_data.readline().strip().split(',')
         while line[0] != '' and line[3] == match_name:
             while line[0] != '' and line[4] == match_map:
                 if line[10] == 'loss':
                     line = eco_data.readline().strip().split(',')
-                matches[match_map][int(line[5])] = (line[6], line[9])
+                    matches[match_map][int(line[5])] = (line[6], line[9])
+                else:
+                    matches[match_map][int(line[5])] = (line[6], line[9])
+                    eco_data.readline().strip().split(',')
                 line = eco_data.readline().strip().split(',')
             match_map = line[4]
             if line[10] == 'loss':
                 line = eco_data.readline().strip().split(',')
-            matches[match_map] = {int(line[5]): (line[6], line[9])}
+                matches[match_map] = {int(line[5]): (line[6], line[9])}
+            else:
+                matches[match_map] = {int(line[5]): (line[6], line[9])}
+                eco_data.readline().strip().split(',')
             line = eco_data.readline().strip().split(',')
 
         game[match_name] = matches
