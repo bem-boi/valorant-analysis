@@ -96,8 +96,12 @@ class Tree:
                 str_so_far += subtree._str_indented(depth + 1)
             return str_so_far
 
-    # functions that read data from file (returns list or dict or list of list?):
-    # teams, matches (with map as item??), defense or attack win
+    def make_tree(self, data: list[dict]) -> Tree:
+        """
+        TODO: docstring
+        :param data:
+        :return:
+        """
 
     # function that takes in data (list or dict) and creates the tree
 
