@@ -96,6 +96,107 @@ class Tree:
                 str_so_far += subtree._str_indented(depth + 1)
             return str_so_far
 
+    def __repr__(self) -> str:
+        """Return a one-line string representation of this tree.
+
+        >>> t = Tree(2, [Tree(4, []), Tree(5, [])])
+        >>> t
+        Tree(2, [Tree(4, []), Tree(5, [])])
+        """
+        return f"Tree({self._root}, {self._subtrees})"
+
+    def insert_sequence(self, items: list) -> None:
+        """Insert the given items into this tree.
+
+        The inserted items form a chain of descendants, where:
+            - items[0] is a child of this tree's root
+            - items[1] is a child of items[0]
+            - items[2] is a child of items[1]
+            - etc.
+
+        Do nothing if items is empty.
+
+        The root of this chain (i.e. items[0]) should be added as a new subtree within this tree, as long as items[0]
+        does not already exist as a child of the current root node. That is, create a new subtree for it
+        and append it to this tree's existing list of subtrees.
+
+        If items[0] is already a child of this tree's root, instead recurse into that existing subtree rather
+        than create a new subtree with items[0]. If there are multiple occurrences of items[0] within this tree's
+        children, pick the left-most subtree with root value items[0] to recurse into.
+
+        Hints:
+
+        To do this recursively, you'll need to recurse on both the tree argument
+        (from self to a subtree) AND on the given items, using the "first" and "rest" idea
+        from RecursiveLists. To access the "rest" of a built-in Python list, you can use
+        list slicing: items[1:len(items)] or simply items[1:], or you can use a recursive helper method
+        that takes an extra "current index" argument to keep track of the next move in the list to add.
+
+        Preconditions:
+            - not self.is_empty()
+
+        >>> t = Tree(111, [])
+        >>> t.insert_sequence([1, 2, 3])
+        >>> print(t)
+        111
+          1
+            2
+              3
+        >>> t.insert_sequence([1, 3, 5])
+        >>> print(t)
+        111
+          1
+            2
+              3
+            3
+              5
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([2, 3, 4])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [Tree(4, [])])])])
+
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([2, 3])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [])])])
+
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([10, 2, 3])
+        >>> print(t)
+        10
+          2
+            3
+          10
+            2
+              3
+        """
+        if items:
+            if all(items[0] != subt._root for subt in self._subtrees):
+                new_tree = Tree(items[0], [])
+                new_tree._insert_helper(items[1:])
+                self._subtrees.append(new_tree)
+            else:
+                for subtree in self._subtrees:
+                    if items[0] == subtree._root:
+                        subtree.insert_sequence(items[1:])
+                        break
+
+    def _insert_helper(self, items: list[int]) -> None:
+        """
+        Inserts a subtree sequence from a given list of items, where items is
+        a sequence of elements [x_1, x_2,...,x_k] and they are inserted into the tree
+        such that x_1 is a child of the tree’s root, x_2 is a child of x_1, x_3 is a
+        child of x_2, etc.
+        >>> t = Tree(10, [])
+        >>> t._insert_helper([2, 3])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [])])])
+        """
+        if items:
+            self._subtrees.append(Tree(items[0], []))
+            for subtree in self._subtrees:
+                subtree._insert_helper(items[1:])
+
     # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
@@ -118,20 +219,87 @@ def read_game(game_data: TextIO) -> list[dict]:
         matches = {}
         match_name = line[3]
         match_map = line[4]
-        team_a = line[5]
-        team_b = line[10]
-        teama_attack = int(line[7])
-        teama_defend = int(line[8])
-        teamb_attack = int(line[12])
-        teamb_defend = int(line[13])
+        team_a, team_b = line[5], line[10]
+        teama_attack, teama_defend = int(line[7]), int(line[8])
+        teamb_attack, teamb_defend = int(line[12]), int(line[13])
         matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
 
         line = game_data.readline().strip().split(',')
         while line[0] != '' and line[3] == match_name:
             match_map = line[4]
-            matches[match_map] = {line[5]: (int(line[7]), int(line[8])), line[10]: int((line[12]), int(line[13]))}
+            matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
             line = game_data.readline().strip().split(',')
 
         game[match_name] = matches
         info.append(game)
     return info
+
+
+def read_buy_type(eco_data: TextIO) -> list[dict]:
+    """
+    TODO: docstring
+    :param eco_data:
+    :return:
+    """
+    info = []
+    eco_data.readline()
+    line = eco_data.readline().strip().split(',')
+    while line[0] != '':
+        game = {}
+        matches = {}
+        match_name = line[3]
+        match_map = line[4]
+        round_num = int(line[5])
+
+        outcome = line[10]
+        if outcome == 'loss':
+            line = eco_data.readline().strip().split(',')
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+        else:
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+            eco_data.readline().strip().split(',')
+
+        line = eco_data.readline().strip().split(',')
+        while line[0] != '' and line[3] == match_name:
+            match_map = line[4]
+            if match_map in matches:
+                if line[10] == 'loss':
+                    line = eco_data.readline().strip().split(',')
+                    matches[match_map][int(line[5])] = (line[6], line[9])
+                else:
+                    matches[match_map][int(line[5])] = (line[6], line[9])
+                    eco_data.readline().strip().split(',')
+            else:
+                if line[10] == 'loss':
+                    line = eco_data.readline().strip().split(',')
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                else:
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                    eco_data.readline().strip().split(',')
+            line = eco_data.readline().strip().split(',')
+
+        game[match_name] = matches
+        info.append(game)
+
+    return info
+
+
+def generate_tree(data: list[dict]) -> Tree:
+    """
+    TODO: docstring
+    :param data:
+    :return:
+    """
+    t = Tree('VCT 2021 - 2023', [])
+    for game in data:
+        keys = list(game.keys())
+        match = keys[0]
+        for m_map in game[match]:
+            for team in game[match][m_map]:
+                items = [match, m_map, team, game[match][m_map][team]]
+                t.insert_sequence(items)
+    return t
