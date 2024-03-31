@@ -35,8 +35,8 @@ COLOUR_SCHEME = [
 
 LINE_COLOUR = 'rgb(210,210,210)'
 VERTEX_BORDER_COLOUR = 'rgb(50, 50, 50)'
-BOOK_COLOUR = 'rgb(89, 205, 105)'
-USER_COLOUR = 'rgb(105, 89, 205)'
+MAP_COLOUR = 'rgb(89, 205, 105)'
+AGENT_COLOUR = 'rgb(105, 89, 205)'
 
 
 def setup_graph(graph: graph_file.WeightedGraph,
@@ -61,7 +61,7 @@ def setup_graph(graph: graph_file.WeightedGraph,
 
     kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]
 
-    colours = [BOOK_COLOUR if kind == 'book' else USER_COLOUR for kind in kinds]
+    colours = [MAP_COLOUR if kind == 'map' else AGENT_COLOUR for kind in kinds]
 
     x_edges = []
     y_edges = []
