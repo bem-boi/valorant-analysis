@@ -306,6 +306,15 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
     :param graph: Weighted graph where all the data is being held
     :param map_played: the current map being played (input from user)
     :return: returns a dictionary of agents and the score from 0-15 of how good the agent is for that map
+
+    >>> cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
+    >>> cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+    >>> agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
+
+    >>> map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
+    >>> g = generate_weighted_graph(map_agent_data)
+    >>> list(best_agent_for_map(g, 'lotus', ['raze', 'yoru', 'jett', 'iso'], 'duelists').keys())
+    ['neon', 'reyna', 'phoenix']
     """
 
     agent_and_score = {}

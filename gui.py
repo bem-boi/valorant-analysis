@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, callback, State
+from dash import Dash, dcc, html, Input, Output, callback, State, ctx
 
 import graph
 from graph import clean_agents_pick_file, clean_teams_picked_agents_file, load_agent_role_data, load_map_agent_data, \
@@ -82,16 +82,27 @@ def update_graph(choice1, choice2):
 @callback(
     Output('output-container-button', 'children'),
     [Input('choice1', 'value'),
-     Input('choice2', 'value')],
-    State('input_user', 'text'),
-    Input('button', 'n_clicks'),
+     Input('choice2', 'value'),
+     Input('button', 'n_clicks')],
+    State('input_user', 'value'),
     prevent_initial_call=True)
-def update_output(choice1, choice2, input_user, n_clicks):
-    click = n_clicks
-    agents_so_far = 'The best agent to play on ' + choice2 + ' are '
-    teammate_agents = str(input_user).split(',')
-    agents_so_far += str(list(graph.best_agent_for_map(map_agent_graph, choice2, teammate_agents, choice1).keys()))
-    return agents_so_far
+def update_output(choice1, choice2, button, input):
+    button_clicked = ctx.triggered_id
+    if button_clicked == 'button':
+        agents_so_far = 'The best agent to play on ' + choice2 + ' are '
+        if choice1 == 'all':
+            choice1 = ''
+        if input is None:
+            agents_so_far += str(
+                list(graph.best_agent_for_map(map_agent_graph, choice2, [], choice1).keys()))
+        else:
+            teammate_agents = input.split(',')
+            agents_so_far += str(
+                list(graph.best_agent_for_map(map_agent_graph, choice2, teammate_agents, choice1).keys()))
+        return agents_so_far + '. This is ordered in descending suitable score of agents on this map'
+    else:
+        return ("Please input the agents your teammates are playing. Answer in the form: (Agent1),(Agent2),...,(Agent4)"
+                "\n. Don't type anything if you can choose any character.")
 
 
 if __name__ == '__main__':
