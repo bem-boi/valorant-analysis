@@ -8,6 +8,7 @@ python-ta~=2.7.0
 # Graphics and graph_data visualization
 plotly>=5.18.0
 pygame==2.5.2
+dash
 
 # Specific to a later exercise
 networkx

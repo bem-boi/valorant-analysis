@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Union
 import csv
 import networkx as nx
+from plotly.graph_objs import Figure
 
 
 class _WeightedVertex:
@@ -202,7 +203,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = None) -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = None, cu_map: str = 'all') -> WeightedGraph:
     """
     Return a weighted graph where:
 
@@ -220,20 +221,34 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = Non
         - map_ref is in the format {map_name: agent_ref}
         where agent_ref is in the format {agent_name: [sum_pick_rate, total_wins, total_played]}
         - role in agent_role.values()
+        - cu_map in {'ascent', 'pearl', 'split', 'lotus', 'icebox', 'fracture', 'bind', 'haven', 'all'}
     """
     g = WeightedGraph()
-    for map_name in map_ref:
-        g.add_vertex(map_name, 'map')
-        for agent_name in map_ref[map_name]:
-            if (role is None) or (map_ref[map_name][agent_name][4] == role):
+    if cu_map == 'all':
+        for map_name in map_ref:
+            g.add_vertex(map_name, 'map')
+            for agent_name in map_ref[map_name]:
+                if (role is None) or (map_ref[map_name][agent_name][4] == role):
+                    if not g.check_exists(agent_name):
+                        g.add_vertex(agent_name, 'agent', map_ref[map_name][agent_name][4])
+                    if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
+                        weight = 0
+                    else:
+                        weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
+                                  5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+                    g.add_edge(map_name, agent_name, round(weight, 2))
+    else:
+        g.add_vertex(cu_map, 'map')
+        for agent_name in map_ref[cu_map]:
+            if (role is None) or (map_ref[cu_map][agent_name][4] == role):
                 if not g.check_exists(agent_name):
-                    g.add_vertex(agent_name, 'agent', map_ref[map_name][agent_name][4])
-                if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
+                    g.add_vertex(agent_name, 'agent', map_ref[cu_map][agent_name][4])
+                if map_ref[cu_map][agent_name][3] == 0 or map_ref[cu_map][agent_name][1] == 0:
                     weight = 0
                 else:
-                    weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
-                              5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
-                g.add_edge(map_name, agent_name, round(weight, 2))
+                    weight = (10 * (map_ref[cu_map][agent_name][2] / map_ref[cu_map][agent_name][3]) +
+                              5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
+                g.add_edge(cu_map, agent_name, round(weight, 2))
     return g
 
 
@@ -319,6 +334,25 @@ def visualize_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
         for role in set(agents_roles.values()):
             g = generate_weighted_graph(map_ref, role)
             visualize_weighted_graph(g)
+
+
+def return_graph(map_ref: dict, role: str, cur_map: str) -> Figure:
+    """
+
+    :param cur_map: 
+    :param agents_roles:
+    :param map_ref:
+    :param role:
+    :return:
+    """
+    from visualization import return_weighted_graph
+    if role == 'all' and cur_map == 'all':
+        g = generate_weighted_graph(map_ref)
+    elif role == 'all' and cur_map != 'all':
+        g = generate_weighted_graph(map_ref, cu_map=cur_map)
+    else:
+        g = generate_weighted_graph(map_ref, role, cur_map)
+    return return_weighted_graph(g)
 
 
 # ---MAIN---

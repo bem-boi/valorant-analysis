@@ -137,6 +137,22 @@ def visualize_weighted_graph(graph: graph_file.WeightedGraph,
     draw_graph(data, output_file, weight_positions)
 
 
+def return_weighted_graph(graph: graph_file.WeightedGraph,
+                             layout: str = 'spring_layout',
+                             max_vertices: int = 5000,
+                             output_file: str = '') -> Figure:
+    """
+
+    :param graph:
+    :param layout:
+    :param max_vertices:
+    :param output_file:
+    :return:
+    """
+    weight_positions, data = setup_graph(graph, layout, max_vertices, True)
+    return return_graph(data, weight_positions)
+
+
 def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None:
     """
     Draw graph based on given data.
@@ -165,3 +181,28 @@ def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None
         fig.show()
     else:
         fig.write_image(output_file)
+
+
+def return_graph(data: list, weight_positions=None) -> Figure:
+    """
+
+    :param data:
+    :param output_file:
+    :param weight_positions:
+    :return:
+    """
+    fig = Figure(data=data)
+    fig.update_layout({'showlegend': False})
+    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
+    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
+
+    if weight_positions:
+        for w in weight_positions:
+            fig.add_annotation(
+                x=w[0], y=w[1],  # Text annotation position
+                xref="x", yref="y",  # Coordinate reference system
+                text=w[2],  # Text content
+                showarrow=False  # Hide arrow
+            )
+
+    return fig
