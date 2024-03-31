@@ -96,12 +96,107 @@ class Tree:
                 str_so_far += subtree._str_indented(depth + 1)
             return str_so_far
 
-    def make_tree(self, data: list[dict]) -> Tree:
+    def __repr__(self) -> str:
+        """Return a one-line string representation of this tree.
+
+        >>> t = Tree(2, [Tree(4, []), Tree(5, [])])
+        >>> t
+        Tree(2, [Tree(4, []), Tree(5, [])])
         """
-        TODO: docstring
-        :param data:
-        :return:
+        return f"Tree({self._root}, {self._subtrees})"
+
+    def insert_sequence(self, items: list) -> None:
+        """Insert the given items into this tree.
+
+        The inserted items form a chain of descendants, where:
+            - items[0] is a child of this tree's root
+            - items[1] is a child of items[0]
+            - items[2] is a child of items[1]
+            - etc.
+
+        Do nothing if items is empty.
+
+        The root of this chain (i.e. items[0]) should be added as a new subtree within this tree, as long as items[0]
+        does not already exist as a child of the current root node. That is, create a new subtree for it
+        and append it to this tree's existing list of subtrees.
+
+        If items[0] is already a child of this tree's root, instead recurse into that existing subtree rather
+        than create a new subtree with items[0]. If there are multiple occurrences of items[0] within this tree's
+        children, pick the left-most subtree with root value items[0] to recurse into.
+
+        Hints:
+
+        To do this recursively, you'll need to recurse on both the tree argument
+        (from self to a subtree) AND on the given items, using the "first" and "rest" idea
+        from RecursiveLists. To access the "rest" of a built-in Python list, you can use
+        list slicing: items[1:len(items)] or simply items[1:], or you can use a recursive helper method
+        that takes an extra "current index" argument to keep track of the next move in the list to add.
+
+        Preconditions:
+            - not self.is_empty()
+
+        >>> t = Tree(111, [])
+        >>> t.insert_sequence([1, 2, 3])
+        >>> print(t)
+        111
+          1
+            2
+              3
+        >>> t.insert_sequence([1, 3, 5])
+        >>> print(t)
+        111
+          1
+            2
+              3
+            3
+              5
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([2, 3, 4])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [Tree(4, [])])])])
+
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([2, 3])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [])])])
+
+        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
+        >>> t.insert_sequence([10, 2, 3])
+        >>> print(t)
+        10
+          2
+            3
+          10
+            2
+              3
         """
+        if items:
+            if all(items[0] != subt._root for subt in self._subtrees):
+                new_tree = Tree(items[0], [])
+                new_tree._insert_helper(items[1:])
+                self._subtrees.append(new_tree)
+            else:
+                for subtree in self._subtrees:
+                    if items[0] == subtree._root:
+                        subtree.insert_sequence(items[1:])
+                        break
+
+    def _insert_helper(self, items: list[int]) -> None:
+        """
+        Inserts a subtree sequence from a given list of items, where items is
+        a sequence of elements [x_1, x_2,...,x_k] and they are inserted into the tree
+        such that x_1 is a child of the tree’s root, x_2 is a child of x_1, x_3 is a
+        child of x_2, etc.
+        >>> t = Tree(10, [])
+        >>> t._insert_helper([2, 3])
+        >>> t
+        Tree(10, [Tree(2, [Tree(3, [])])])
+        """
+        if items:
+            self._subtrees.append(Tree(items[0], []))
+            for subtree in self._subtrees:
+                subtree._insert_helper(items[1:])
+
     # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
@@ -191,3 +286,20 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
         info.append(game)
 
     return info
+
+
+def generate_tree(data: list[dict]) -> Tree:
+    """
+    TODO: docstring
+    :param data:
+    :return:
+    """
+    t = Tree('VCT 2021 - 2023', [])
+    for game in data:
+        keys = list(game.keys())
+        match = keys[0]
+        for m_map in game[match]:
+            for team in game[match][m_map]:
+                items = [match, m_map, team, game[match][m_map][team]]
+                t.insert_sequence(items)
+    return t
