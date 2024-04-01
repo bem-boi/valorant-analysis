@@ -1,14 +1,4 @@
-"""CSC111 Winter 2024 Exercise 4 (Graphs Visualization)
-
-Module Description
-==================
-
-This module contains some Python functions that you can use to visualize the graphs
-you're working with on this assignment. You should not modify anything in this file.
-It will not be submitted for grading.
-
-Disclaimer: we didn't have time to make this file fully PythonTA-compliant!
-
+"""
 Copyright and Usage Information
 ===============================
 
@@ -19,6 +9,8 @@ expressly prohibited. For more information on copyright for CSC111 materials,
 please consult our Course Syllabus.
 
 This file is Copyright (c) 2024 CSC111 Teaching Team
+
+We amended this source code from ex4_visualization.py
 """
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
