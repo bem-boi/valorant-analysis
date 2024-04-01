@@ -197,6 +197,28 @@ class Tree:
             for subtree in self._subtrees:
                 subtree._insert_helper(items[1:])
 
+    def best_side_for_map(self, map_played: str) -> str:
+        """
+        TODO: docstring
+        :param map_played:
+        :return:
+        """
+        attack = 0
+        defend = 0
+        for subtree1 in self._subtrees:
+            for subtree2 in subtree1._subtrees:
+                if subtree2._root == map_played:
+                    for subtree3 in subtree2._subtrees:
+                        for subtree4 in subtree3._subtrees:
+                            attack += subtree4._root[0]
+                            defend += subtree4._root[1]
+        if attack > defend:
+            return "Attacker sided"
+        if attack < defend:
+            return "Defender sided"
+        else:
+            return "Map favours both sides"
+
     # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
@@ -227,6 +249,9 @@ def read_game(game_data: TextIO) -> list[dict]:
         line = game_data.readline().strip().split(',')
         while line[0] != '' and line[3] == match_name:
             match_map = line[4]
+            team_a, team_b = line[5], line[10]
+            teama_attack, teama_defend = int(line[7]), int(line[8])
+            teamb_attack, teamb_defend = int(line[12]), int(line[13])
             matches[match_map] = {team_a: (teama_attack, teama_defend), team_b: (teamb_attack, teamb_defend)}
             line = game_data.readline().strip().split(',')
 
@@ -288,7 +313,7 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
     return info
 
 
-def generate_tree(data: list[dict]) -> Tree:
+def generate_tree_game(data: list[dict]) -> Tree:
     """
     TODO: docstring
     :param data:
@@ -301,5 +326,22 @@ def generate_tree(data: list[dict]) -> Tree:
         for m_map in game[match]:
             for team in game[match][m_map]:
                 items = [match, m_map, team, game[match][m_map][team]]
+                t.insert_sequence(items)
+    return t
+
+
+def generate_tree_buy(data: list[dict]) -> Tree:
+    """
+    TODO: docstring
+    :param data:
+    :return:
+    """
+    t = Tree('VCT 2021 - 2023', [])
+    for game in data:
+        keys = list(game.keys())
+        match = keys[0]
+        for m_map in game[match]:
+            for rounds in game[match][m_map]:
+                items = [match, m_map, rounds, game[match][m_map][rounds]]
                 t.insert_sequence(items)
     return t
