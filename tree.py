@@ -219,13 +219,6 @@ class Tree:
         else:
             return "Map favours both sides"
 
-    # functions that read graph_data from file (returns list or dict or list of list?):
-    # teams, matches (with map as item??), defense or attack win
-
-    # function that takes in graph_data (list or dict) and creates the tree
-
-    # then traverse the tree to get "most likely to win" stuff (figure that out later)
-
 
 def read_game(game_data: TextIO) -> list[dict]:
     """
