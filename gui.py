@@ -160,6 +160,5 @@ def update_output(choice2, button, input):
 # --------------------------------------- which agent to play ------------------------------------------------- #
 
 
-
 if __name__ == '__main__':
     app.run(debug=True)

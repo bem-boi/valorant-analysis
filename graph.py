@@ -215,20 +215,22 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: list[set],
-                            role: str = None, cu_map: str = 'all') -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: list[set], role: str = None,
+                            cu_map: str = 'all', view_agent_weights : bool = False) -> WeightedGraph:
     """
     Return a weighted graph where:
 
-    - The vertices are the different maps and the agents in the csv files provided
+    - The vertices are the different maps and the agents in map_ref
 
     - The weight of the edges (for agent-map edges) is calculated by the following formula:
         IF (Total Maps Played = 0 or Number of Times Picked = 0),
             THEN 0
         ELSE
             10 * ((Total Wins By Map) / (Total Maps Played)) +  5 * (Sum Pick Rate Percentages / Number of Times Picked)
-
       This acts as a measure for how good an agent is for a particular map (weight will be between 0 and 15)
+
+    - If view_agent_weights is True, then add edges between agents whose weight is a score for how often they are played
+        together in professional play
 
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
@@ -263,18 +265,27 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
                               5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
                 g.add_edge(cu_map, agent_name, round(weight, 2))
 
-    for agent_combo in agent_combos:
-        for agent1 in agent_combo:
-            for agent2 in agent_combo:
-                v1, v2 = g.get_vertex(agent1), g.get_vertex(agent2)
-                if v1 and v2:
-                    if not g.adjacent(agent1, agent2):
-                        g.add_edge(agent1, agent2, 1)
-                    else:
-                        v1.neighbours[[u2 for u2 in v1.neighbours if u2.item == agent2][0]] += 1
-                        v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent1][0]] += 1
+    if view_agent_weights:
+        for agent_combo in agent_combos:
+            add_agent_combo(agent_combo, g)
 
     return g
+
+
+def add_agent_combo(agent_combination: set, g: WeightedGraph):
+    """
+    Update the weights of all agent pairs in agent_combination to the graph g.
+    If any agent pair doesn't exist in g, add it to g.
+    """
+    for agent1 in agent_combination:
+        for agent2 in agent_combination:
+            v1, v2 = g.get_vertex(agent1), g.get_vertex(agent2)
+            if v1 and v2:
+                if not g.adjacent(agent1, agent2):
+                    g.add_edge(agent1, agent2, 1)
+                else:
+                    v1.neighbours[[u2 for u2 in v1.neighbours if u2.item == agent2][0]] += 1
+                    v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent1][0]] += 1
 
 
 def clean_agents_pick_file(file_path: str) -> str:
@@ -404,7 +415,7 @@ def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
         visualize_weighted_graph(g, output_file=file_name)
 
 
-def visualize_agent_graph(agents_roles: dict, map_ref: dict, role: str = '') -> None:
+def visualize_agent_graph(agents_roles: dict, map_ref: dict, agent_combos: list, role: str = '') -> None:
     """
     Visualize a graph of agents of type role only and maps.
     If role is an empty string, then visualize graphs for all roles
@@ -415,11 +426,11 @@ def visualize_agent_graph(agents_roles: dict, map_ref: dict, role: str = '') -> 
     """
     from visualization import visualize_weighted_graph
     if role:
-        g = generate_weighted_graph(map_ref, role)
+        g = generate_weighted_graph(map_ref, agent_combos, role)
         visualize_weighted_graph(g)
     else:
         for role in set(agents_roles.values()):
-            g = generate_weighted_graph(map_ref, role)
+            g = generate_weighted_graph(map_ref, agent_combos, role)
             visualize_weighted_graph(g)
 
 
