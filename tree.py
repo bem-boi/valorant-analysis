@@ -272,7 +272,7 @@ class Tree:
     # then traverse the tree to get "most likely to win" stuff (figure that out later)
 
 
-def read_game(game_data: TextIO) -> tuple(str, list[dict]):
+def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
     """
     TODO: docstring
     :param game_data:
@@ -308,7 +308,7 @@ def read_game(game_data: TextIO) -> tuple(str, list[dict]):
     return (year, info)
 
 
-def read_buy_type(eco_data: TextIO) -> tuple(str, list[dict]):
+def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     """
     TODO: docstring
     :param eco_data:
@@ -407,7 +407,11 @@ if __name__ == '__main__':
     eco_file_2022 = open('graph_data/eco_rounds_2022.csv')
     eco_file_2023 = open('graph_data/eco_rounds_2023.csv')
 
-    game_2021 = generate_tree_game()
+    game_data_2021 = read_game(game_file_2021)
+    game_data_2022 = read_game(game_file_2022)
+    game_data_2023 = read_game(game_file_2023)
+
+    game_tree_2021 = generate_tree_game(game_data_2021[1], game_data_2021[0])
 
     cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
     cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
