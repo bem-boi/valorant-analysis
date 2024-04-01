@@ -373,6 +373,23 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
     return sorted_agent_and_score
 
 
+def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
+    """
+    returns a dict of compatible agents (the most played combination) with the chosen agent.
+    :param graph:
+    :param map_played:
+    :param agent:
+    :return:
+    """
+    list_of_compatible = {}
+    for u in graph.get_neighbours(agent):
+        if u not in list_of_compatible and u != agent and graph.get_vertex(u).kind == 'agent':
+            list_of_compatible[u] = graph.get_weight(u, agent)
+
+    sorted_compatible = dict(sorted(list_of_compatible.items(), key=lambda item: item[1], reverse=True))
+    return sorted_compatible
+
+
 def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
     """
     Visualize the graph g
@@ -406,10 +423,11 @@ def visualize_agent_graph(agents_roles: dict, map_ref: dict, role: str = '') -> 
             visualize_weighted_graph(g)
 
 
-def return_graph(map_ref: dict, role: str, cur_map: str) -> Figure:
+def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str) -> Figure:
     """
 
-    :param cur_map: 
+    :param agent_comb:
+    :param cur_map:
     :param agents_roles:
     :param map_ref:
     :param role:
@@ -417,11 +435,11 @@ def return_graph(map_ref: dict, role: str, cur_map: str) -> Figure:
     """
     from visualization import return_weighted_graph
     if role == 'all' and cur_map == 'all':
-        g = generate_weighted_graph(map_ref)
+        g = generate_weighted_graph(map_ref, agent_comb)
     elif role == 'all' and cur_map != 'all':
-        g = generate_weighted_graph(map_ref, cu_map=cur_map)
+        g = generate_weighted_graph(map_ref, agent_comb, cu_map=cur_map)
     else:
-        g = generate_weighted_graph(map_ref, role, cur_map)
+        g = generate_weighted_graph(map_ref, agent_comb, role, cur_map)
     return return_weighted_graph(g)
 
 
