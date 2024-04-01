@@ -210,11 +210,12 @@ class Tree:
         defend = 0
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root == map_played:
+                if subtree2._root.lower() == map_played:
                     for subtree3 in subtree2._subtrees:
                         for subtree4 in subtree3._subtrees:
-                            attack += subtree4._root[0]
-                            defend += subtree4._root[1]
+                            for subtree5 in subtree4._subtrees:
+                                attack += subtree5._root[0]
+                                defend += subtree5._root[1]
         if attack > defend:
             return "Attacker sided"
         if attack < defend:
@@ -234,17 +235,18 @@ class Tree:
         full = 0
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root == map_played:
+                if subtree2._root.lower() == map_played:
                     for subtree3 in subtree2._subtrees:
                         for subtree4 in subtree3._subtrees:
-                            if subtree4._root[1] == 'Eco: 0-5k':
-                                eco += 1
-                            elif subtree4._root[1] == 'Semi-eco: 5-10k':
-                                semi_eco += 1
-                            elif subtree4._root[1] == 'Semi-buy: 10-20k':
-                                semi_buy += 1
-                            else:
-                                full += 1
+                            for subtree5 in subtree4._subtrees:
+                                if subtree5._root[1] == 'Eco: 0-5k':
+                                    eco += 1
+                                elif subtree5._root[1] == 'Semi-eco: 5-10k':
+                                    semi_eco += 1
+                                elif subtree5._root[1] == 'Semi-buy: 10-20k':
+                                    semi_buy += 1
+                                else:
+                                    full += 1
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
             return 'Eco buy is most effective'
@@ -263,13 +265,6 @@ class Tree:
         """
         for tree in trees:
             self._subtrees.append(tree)
-
-    # functions that read graph_data from file (returns list or dict or list of list?):
-    # teams, matches (with map as item??), defense or attack win
-
-    # function that takes in graph_data (list or dict) and creates the tree
-
-    # then traverse the tree to get "most likely to win" stuff (figure that out later)
 
 
 def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
@@ -363,7 +358,7 @@ def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     return (year, info)
 
 
-def generate_tree_game(data: list[dict], year: str) -> Tree:
+def generate_tree(year: str, data: list[dict]) -> Tree:
     """
     TODO: docstring
     :param data:
@@ -376,23 +371,6 @@ def generate_tree_game(data: list[dict], year: str) -> Tree:
         for m_map in game[match]:
             for team in game[match][m_map]:
                 items = [match, m_map, team, game[match][m_map][team]]
-                t.insert_sequence(items)
-    return t
-
-
-def generate_tree_buy(data: list[dict], year: str) -> Tree:
-    """
-    TODO: docstring
-    :param data:
-    :return:
-    """
-    t = Tree('VCT ' + year, [])
-    for game in data:
-        keys = list(game.keys())
-        match = keys[0]
-        for m_map in game[match]:
-            for rounds in game[match][m_map]:
-                items = [match, m_map, rounds, game[match][m_map][rounds]]
                 t.insert_sequence(items)
     return t
 
@@ -411,29 +389,24 @@ if __name__ == '__main__':
     game_data_2022 = read_game(game_file_2022)
     game_data_2023 = read_game(game_file_2023)
 
-    game_tree_2021 = generate_tree_game(game_data_2021[1], game_data_2021[0])
+    eco_data_2021 = read_buy_type(eco_file_2021)
+    eco_data_2022 = read_buy_type(eco_file_2022)
+    eco_data_2023 = read_buy_type(eco_file_2023)
 
-    cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
-    cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
+    game_tree_2021 = generate_tree(game_data_2021[0], game_data_2021[1])
+    game_tree_2022 = generate_tree(game_data_2022[0], game_data_2022[1])
+    game_tree_2023 = generate_tree(game_data_2023[0], game_data_2023[1])
 
-    agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
-    agent_combinations = load_agent_combo_data(cleaned_aa_file)
-    map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
+    eco_tree_2021 = generate_tree(eco_data_2021[0], eco_data_2021[1])
+    eco_tree_2022 = generate_tree(eco_data_2022[0], eco_data_2022[1])
+    eco_tree_2023 = generate_tree(eco_data_2023[0], eco_data_2023[1])
 
-    map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, cu_map='haven')
+    vct_tree = Tree('VCT', [])
+    vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
 
-    # current_map = input("What map are you playing?").lower()
-    # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
-    # # enter would make it '' type
-    # teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
-    #                      "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
-    # teammate_data = []
-    # if teammate_ask == 'YES':
-    #     for i in range(4):
-    #         teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?").lower())
-    #
-    # agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
-    # # that the user should play on that map
-    # print(agents_to_play)
+    eco_tree = Tree('VCT buy types', [])
+    eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
-    # visualize_graph(agent_role_data, map_agent_data, '')
+    current_map = input("What map are you playing?").lower()
+    print("This map is " + vct_tree.best_side_for_map(current_map))
+    print(eco_tree.best_buy_for_map(current_map))
