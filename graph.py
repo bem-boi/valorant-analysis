@@ -112,18 +112,18 @@ class WeightedGraph:
 
     def check_exists(self, item: Any) -> bool:
         """
-
-        :return:
+        Return whether item is in self
         """
         return item in self._vertices
 
-    def get_vertex(self, item: Any) -> _WeightedVertex:
+    def get_vertex(self, item: Any) -> _WeightedVertex | None:
         """
-
-        :param item:
-        :return:
+        Return the vertex with value item or None if item is not in self
         """
-        return self._vertices[item]
+        if item in self._vertices:
+            return self._vertices[item]
+        else:
+            return None
 
     def to_networkx(self, max_vertices: int = 5000) -> nx.Graph:
         """Convert this graph into a networkx Graph.
@@ -152,9 +152,7 @@ class WeightedGraph:
 
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
-
-    :param agent_role: file where the data of agents and their roles are kept
-    :return: returns a dictionary of the agents and their roles
+    Return a dictionary
     """
     agent = {}
     with open(agent_role, 'r') as file:
@@ -163,6 +161,19 @@ def load_agent_role_data(agent_role: str) -> dict[str: str]:
         for row in reader:
             agent[row[0].lower()] = row[1].lower()
     return agent
+
+
+def load_agent_combo_data(all_agents: str) -> list[set]:
+    """
+    Return a list of agent combinations, where an agent combination is a set of the agent names in combination
+    """
+    agent_combs = []
+    with open(all_agents, 'r') as file:
+        next(file)
+        reader = csv.reader(file)
+        for row in reader:
+            agent_combs.append(set(row[0].split(',')))
+    return agent_combs
 
 
 def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_roles: dict) -> dict[str, dict[str, list]]:
@@ -200,10 +211,12 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
         for row in reader:
             map_ref[row[0]][row[1]][2] += int(row[2])  # update total_wins_so_far
             map_ref[row[0]][row[1]][3] += int(row[3])  # update total_played_so_far
+
     return map_ref
 
 
-def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = None, cu_map: str = 'all') -> WeightedGraph:
+def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: list[set],
+                            role: str = None, cu_map: str = 'all') -> WeightedGraph:
     """
     Return a weighted graph where:
 
@@ -249,26 +262,39 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], role: str = Non
                     weight = (10 * (map_ref[cu_map][agent_name][2] / map_ref[cu_map][agent_name][3]) +
                               5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
                 g.add_edge(cu_map, agent_name, round(weight, 2))
+
+    for agent_combo in agent_combos:
+        for agent1 in agent_combo:
+            for agent2 in agent_combo:
+                v1, v2 = g.get_vertex(agent1), g.get_vertex(agent2)
+                if v1 and v2:
+                    if not g.adjacent(agent1, agent2):
+                        g.add_edge(agent1, agent2, 1)
+                    else:
+                        v1.neighbours[[u2 for u2 in v1.neighbours if u2.item == agent2][0]] += 1
+                        v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent1][0]] += 1
+
     return g
 
 
-def clean_agents_pick_file(file: str) -> str:
+def clean_agents_pick_file(file_path: str) -> str:
     """
-    Create a file and return its path that is of the following format:
+    Return the path of a new file that is of the following format:
         Map,Agent,Pick Rate
-    where pick rate is written as a decimal between 0 and 1 (e.g. 0.16 to represent 16%)
+    which correspond to columns of the file being referred to by file_path except pick rate
+    which is the pick rate from file_path but is written as a decimal between 0 and 1 (e.g. 0.16 to represent 16%)
 
     Do not select rows where Map = 'All Maps'
 
     Precondition:
-        - file is a path to a CSV file
+        - file_path is a path to a CSV file
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Agent,Pick Rate
     """
     with open('cleaned_agents_pick_rates.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent', 'Pick Rate'])
-        with open(file, 'r') as read_file:
+        with open(file_path, 'r') as read_file:
             next(read_file)
             reader = csv.reader(read_file)
             for row in reader:
@@ -277,25 +303,46 @@ def clean_agents_pick_file(file: str) -> str:
     return 'cleaned_agents_pick_rates.csv'
 
 
-def clean_teams_picked_agents_file(file: str) -> str:
+def clean_teams_picked_agents_file(file_path: str) -> str:
     """
-    Create a file and return its path that is of the following format:
+    Return the path of a new file that is of the following format:
         Map,Agent Picked,Total Wins By Map,Total Maps Played
+    which correspond to columns of the file being referred to by file_path
 
     Precondition:
-        - file is a path to a CSV file
+        - file_path is a path to a CSV file
         - the CSV file being referred to has the following format:
             Tournament,Stage,Match Type,Map,Team,Agent Picked,Total Wins By Map,Total Loss By Map,Total Maps Played
     """
     with open('cleaned_teams_picked_agents.csv', 'w', newline="") as write_file:
         writer = csv.writer(write_file)
         writer.writerow(['Map', 'Agent Picked', 'Total Wins By Map', 'Total Maps Played'])
-        with open(file, 'r') as read_file:
+        with open(file_path, 'r') as read_file:
             next(read_file)
             reader = csv.reader(read_file)
             for row in reader:
                 writer.writerow([row[3].lower(), row[5], row[6], row[8]])
     return 'cleaned_teams_picked_agents.csv'
+
+
+def clean_all_agents_file(file_path: str) -> str:
+    """
+    Return the path of a new file that is a cleaned file version of file_path (removing whitespaces)
+
+    Preconditions:
+        - file_path is a path to a CSV file
+        - Each row in the CSV file being referred to is a list of agent names separated by commas
+          (and possibly whitespaces)
+    """
+    with open('cleaned_all_agents.csv', 'w', newline='') as write_file:
+        writer = csv.writer(write_file)
+        writer.writerow(['Agents'])
+        with open(file_path, 'r') as read_file:
+            next(read_file)
+            reader = csv.reader(read_file)
+            for row in reader:
+                writer.writerow([u.replace(' ', '') for u in row])
+    return 'cleaned_all_agents.csv'
 
 
 def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, role: str = '') -> dict[str: float]:
@@ -382,10 +429,13 @@ def return_graph(map_ref: dict, role: str, cur_map: str) -> Figure:
 if __name__ == '__main__':
     cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
     cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
-    agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
+    cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
 
+    agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
+    agent_combinations = load_agent_combo_data(cleaned_aa_file)
     map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
-    map_agent_graph = generate_weighted_graph(map_agent_data)
+
+    map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, cu_map='haven')
 
     # current_map = input("What map are you playing?").lower()
     # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
