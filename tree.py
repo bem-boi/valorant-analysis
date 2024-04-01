@@ -219,6 +219,39 @@ class Tree:
         else:
             return "Map favours both sides"
 
+    def best_buy_for_map(self, map_played: str) -> str:
+        """
+        TODO: docstring
+        :param map_played:
+        :return:
+        """
+        eco = 0
+        semi_eco = 0
+        semi_buy = 0
+        full = 0
+        for subtree1 in self._subtrees:
+            for subtree2 in subtree1._subtrees:
+                if subtree2._root == map_played:
+                    for subtree3 in subtree2._subtrees:
+                        for subtree4 in subtree3._subtrees:
+                            if subtree4._root[1] == 'Eco: 0-5k':
+                                eco += 1
+                            elif subtree4._root[1] == 'Semi-eco: 5-10k':
+                                semi_eco += 1
+                            elif subtree4._root[1] == 'Semi-buy: 10-20k':
+                                semi_buy += 1
+                            else:
+                                full += 1
+        all_buys = [eco, semi_eco, semi_buy, full]
+        if max(all_buys) == eco:
+            return 'Eco buy is most effective'
+        elif max(all_buys) == semi_eco:
+            return 'Semi-eco buy is most effective'
+        elif max(all_buys) == semi_buy:
+            return 'Semi-buy is most effective'
+        else:
+            return 'Full buy is most effective'
+
     # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
