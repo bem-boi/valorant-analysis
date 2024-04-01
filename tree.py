@@ -310,7 +310,7 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
         round_num = int(line[5])
 
         outcome = line[10]
-        if outcome == 'loss':
+        if outcome == 'Loss':
             line = eco_data.readline().strip().split(',')
             winning_team = line[6]
             type_buy = line[9]
