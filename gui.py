@@ -4,7 +4,6 @@ import graph
 from graph import clean_agents_pick_file, clean_teams_picked_agents_file, load_agent_role_data, load_map_agent_data, \
     generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data, compatible_agents
 
-import plotly.graph_objs as go
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -15,8 +14,7 @@ cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
 agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
 agent_combinations = load_agent_combo_data(cleaned_aa_file)
 map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
-map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations)
-
+map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, view_agent_weights=True)
 
 app = Dash(__name__)
 
@@ -38,6 +36,9 @@ def render_content(tab):
         return html.Div([
             html.H3('Which Agents to play'),
             html.Hr(),
+            dcc.RadioItems(
+                ['hide_agent_weight', 'show_agent_weight'], 'hide_agent_weight',
+                inline=True, id='choice0_1'),
             dcc.RadioItems(
                 ['duelists',
                  'controllers',
@@ -100,11 +101,15 @@ def render_content(tab):
 
 @callback(
     Output(component_id='visual_graph_1', component_property='figure'),
-    [Input(component_id='choice1_1', component_property='value'),
+    [Input('choice0_1', 'value'),
+     Input(component_id='choice1_1', component_property='value'),
      Input(component_id='choice2_1', component_property='value')]
 )
-def update_graph(choice1, choice2):
-    fig = return_graph(map_agent_data, agent_combinations, choice1, choice2)
+def update_graph(choice0, choice1, choice2):
+    if choice0 == 'hide_agent_weight':
+        fig = return_graph(map_agent_data, agent_combinations, choice1, choice2)
+    else:
+        fig = return_graph(map_agent_data, agent_combinations, choice1, choice2, view_agent_weights=True)
     return fig
 
 
@@ -161,4 +166,4 @@ def update_output(choice2, button, input):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8052)

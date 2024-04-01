@@ -216,7 +216,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
 
 
 def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: list[set], role: str = None,
-                            cu_map: str = 'all', view_agent_weights : bool = False) -> WeightedGraph:
+                            cu_map: str = 'all', view_agent_weights: bool = False) -> WeightedGraph:
     """
     Return a weighted graph where:
 
@@ -434,9 +434,11 @@ def visualize_agent_graph(agents_roles: dict, map_ref: dict, agent_combos: list,
             visualize_weighted_graph(g)
 
 
-def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str) -> Figure:
+def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str,
+                 view_agent_weights: bool = False) -> Figure:
     """
 
+    :param view_agent_weights:
     :param agent_comb:
     :param cur_map:
     :param agents_roles:
@@ -445,12 +447,20 @@ def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str) 
     :return:
     """
     from visualization import return_weighted_graph
-    if role == 'all' and cur_map == 'all':
-        g = generate_weighted_graph(map_ref, agent_comb)
-    elif role == 'all' and cur_map != 'all':
-        g = generate_weighted_graph(map_ref, agent_comb, cu_map=cur_map)
+    if not view_agent_weights:
+        if role == 'all' and cur_map == 'all':
+            g = generate_weighted_graph(map_ref, agent_comb)
+        elif role == 'all' and cur_map != 'all':
+            g = generate_weighted_graph(map_ref, agent_comb, cu_map=cur_map)
+        else:
+            g = generate_weighted_graph(map_ref, agent_comb, role, cur_map)
     else:
-        g = generate_weighted_graph(map_ref, agent_comb, role, cur_map)
+        if role == 'all' and cur_map == 'all':
+            g = generate_weighted_graph(map_ref, agent_comb, view_agent_weights=view_agent_weights)
+        elif role == 'all' and cur_map != 'all':
+            g = generate_weighted_graph(map_ref, agent_comb, cu_map=cur_map, view_agent_weights=view_agent_weights)
+        else:
+            g = generate_weighted_graph(map_ref, agent_comb, role, cur_map, view_agent_weights=view_agent_weights)
     return return_weighted_graph(g)
 
 
