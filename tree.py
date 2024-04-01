@@ -292,14 +292,14 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
         while line[0] != '' and line[3] == match_name:
             match_map = line[4]
             if match_map in matches:
-                if line[10] == 'loss':
+                if line[10] == 'Loss':
                     line = eco_data.readline().strip().split(',')
                     matches[match_map][int(line[5])] = (line[6], line[9])
                 else:
                     matches[match_map][int(line[5])] = (line[6], line[9])
                     eco_data.readline().strip().split(',')
             else:
-                if line[10] == 'loss':
+                if line[10] == 'Loss':
                     line = eco_data.readline().strip().split(',')
                     matches[match_map] = {int(line[5]): (line[6], line[9])}
                 else:
