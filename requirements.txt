@@ -8,10 +8,11 @@ python-ta~=2.7.0
 # Graphics and graph_data visualization
 plotly>=5.18.0
 pygame==2.5.2
-dash
+dash~=2.16.1
 
 # Specific to a later exercise
-networkx
+networkx~=3.2.1
 numpy
 scipy
 kaleido
+igraph~=0.11.4

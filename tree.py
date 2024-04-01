@@ -1,3 +1,6 @@
+"""
+trees r slay
+"""
 from __future__ import annotations
 from typing import Any, Optional, TextIO
 
@@ -252,6 +255,15 @@ class Tree:
         else:
             return 'Full buy is most effective'
 
+    def combine_all(self, trees: list) -> None:
+        """
+        TODO: docstring
+        :param trees:
+        :return:
+        """
+        for tree in trees:
+            self._subtrees.append(tree)
+
     # functions that read graph_data from file (returns list or dict or list of list?):
     # teams, matches (with map as item??), defense or attack win
 
@@ -260,7 +272,7 @@ class Tree:
     # then traverse the tree to get "most likely to win" stuff (figure that out later)
 
 
-def read_game(game_data: TextIO) -> list[dict]:
+def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
     """
     TODO: docstring
     :param game_data:
@@ -269,6 +281,9 @@ def read_game(game_data: TextIO) -> list[dict]:
     info = []
     game_data.readline()
     line = game_data.readline().strip().split(',')
+
+    year = line[0].split()[2]
+
     while line[0] != '':
         game = {}
         matches = {}
@@ -290,10 +305,10 @@ def read_game(game_data: TextIO) -> list[dict]:
 
         game[match_name] = matches
         info.append(game)
-    return info
+    return (year, info)
 
 
-def read_buy_type(eco_data: TextIO) -> list[dict]:
+def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     """
     TODO: docstring
     :param eco_data:
@@ -302,6 +317,9 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
     info = []
     eco_data.readline()
     line = eco_data.readline().strip().split(',')
+
+    year = line[0].split()[2]
+
     while line[0] != '':
         game = {}
         matches = {}
@@ -342,17 +360,16 @@ def read_buy_type(eco_data: TextIO) -> list[dict]:
 
         game[match_name] = matches
         info.append(game)
+    return (year, info)
 
-    return info
 
-
-def generate_tree_game(data: list[dict]) -> Tree:
+def generate_tree_game(data: list[dict], year: str) -> Tree:
     """
     TODO: docstring
     :param data:
     :return:
     """
-    t = Tree('VCT 2021 - 2023', [])
+    t = Tree('VCT ' + year, [])
     for game in data:
         keys = list(game.keys())
         match = keys[0]
@@ -363,13 +380,13 @@ def generate_tree_game(data: list[dict]) -> Tree:
     return t
 
 
-def generate_tree_buy(data: list[dict]) -> Tree:
+def generate_tree_buy(data: list[dict], year: str) -> Tree:
     """
     TODO: docstring
     :param data:
     :return:
     """
-    t = Tree('VCT 2021 - 2023', [])
+    t = Tree('VCT ' + year, [])
     for game in data:
         keys = list(game.keys())
         match = keys[0]
@@ -378,3 +395,45 @@ def generate_tree_buy(data: list[dict]) -> Tree:
                 items = [match, m_map, rounds, game[match][m_map][rounds]]
                 t.insert_sequence(items)
     return t
+
+
+# ---MAIN---
+if __name__ == '__main__':
+    game_file_2021 = open('graph_data/maps_scores_2021.csv')
+    game_file_2022 = open('graph_data/maps_scores_2022.csv')
+    game_file_2023 = open('graph/data/maps_scores_2023.csv')
+
+    eco_file_2021 = open('graph_data/eco_rounds_2021.csv')
+    eco_file_2022 = open('graph_data/eco_rounds_2022.csv')
+    eco_file_2023 = open('graph_data/eco_rounds_2023.csv')
+
+    game_data_2021 = read_game(game_file_2021)
+    game_data_2022 = read_game(game_file_2022)
+    game_data_2023 = read_game(game_file_2023)
+
+    game_tree_2021 = generate_tree_game(game_data_2021[1], game_data_2021[0])
+
+    cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+    cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
+
+    agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
+    agent_combinations = load_agent_combo_data(cleaned_aa_file)
+    map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
+
+    map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, cu_map='haven')
+
+    # current_map = input("What map are you playing?").lower()
+    # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
+    # # enter would make it '' type
+    # teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
+    #                      "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
+    # teammate_data = []
+    # if teammate_ask == 'YES':
+    #     for i in range(4):
+    #         teammate_data.append(input(str(i + 1) + ": What agent is this teammate playing?").lower())
+    #
+    # agents_to_play = best_agent_for_map(map_agent_graph, current_map, teammate_data, favored_role)  # list of agents
+    # # that the user should play on that map
+    # print(agents_to_play)
+
+    # visualize_graph(agent_role_data, map_agent_data, '')
