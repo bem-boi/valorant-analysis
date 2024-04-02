@@ -97,7 +97,7 @@ def render_content(tab):
     html.Div(id='tabs-content')
 
 
-# --------------------------------------- which agent to play ------------------------------------------------- #
+# --------------------------------------------- which agent to play ------------------------------------------------- #
 
 @callback(
     Output(component_id='visual_graph_1', component_property='figure'),
@@ -162,7 +162,7 @@ def update_output(choice2, button, input):
         return "Enter an agent you're playing and press submit."
 
 
-# --------------------------------------- which agent to play ------------------------------------------------- #
+# ---------------------------------------------- which agent to play ------------------------------------------------ #
 
 
 if __name__ == '__main__':

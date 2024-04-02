@@ -173,6 +173,7 @@ class WeightedGraph:
         return graph_nx
 
 
+# -------------------------------------------- DATA LOADING FUNCTIONS ----------------------------------------------- #
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
     Return a dictionary where the keys are the agent names and the values are the type of role (e.g. duelists)
@@ -208,7 +209,7 @@ def load_agent_combo_data(all_agents: str) -> list[set]:
     return agent_combs
 
 
-def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_roles: dict) -> dict[str, dict[str, list]]:
+def load_map_agent_data(agent_pick_rates: str, teams_agent_file: str, agent_roles: dict) -> dict[str, dict[str, list]]:
     """
     Return a dictionary where the keys are all the maps in the csv files (referred to by the arguments)
     and where the values are dictionaries whose keys are all the agents in the csv files
@@ -221,7 +222,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     Preconditions:
         - agent_pick_rates is a path to a csv file, each row of which is in the format:
             [Map,Agent,Pick Rate]
-        - teams_pick_rates is a path to a csv file, each row of which  is in the format:
+        - teams_agent_file is a path to a csv file, each row of which  is in the format:
             [Map,Agent Picked,Total Wins By Map,Total Maps Played]
     """
     map_ref = {}  # {map_name: agent_ref} and agent_ref in format
@@ -238,7 +239,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
             else:  # the map is already in map_ref and the agent is already in its agent_ref
                 map_ref[row[0]][row[1]][0] += float(row[2])  # update sum_pick_rate_so_far
                 map_ref[row[0]][row[1]][1] += 1  # update count_pick_rate_so_far
-    with open(teams_picked_agent, 'r') as file:
+    with open(teams_agent_file, 'r') as file:
         next(file)
         reader = csv.reader(file)
         for row in reader:
@@ -246,6 +247,8 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
             map_ref[row[0]][row[1]][3] += int(row[3])  # update total_played_so_far
 
     return map_ref
+
+# ------------------------------------------------------------------------------------------------------------------- #
 
 
 def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: list[set], role: str = None,
@@ -333,6 +336,7 @@ def add_agent_combo(agent_combination: set, g: WeightedGraph):
                     v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent_combs[i]][0]] += 1
 
 
+# -------------------------------------------- DATA LOADING FUNCTIONS ----------------------------------------------- #
 def clean_agents_pick_file(file_path: str) -> str:
     """
     Return the path of a new file that is of the following format:
@@ -401,6 +405,7 @@ def clean_all_agents_file(file_path: str) -> str:
     return 'cleaned_all_agents.csv'
 
 
+# ------------------------------------------ FUNCTIONS FOR VISUALIZATION -------------------------------------------- #
 def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, role: str = '') -> dict[str: float]:
     """
     Returns a dictionary of agents and the score (that is between 0 and 15) of how good the agent is for that map
@@ -506,7 +511,7 @@ def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str,
     return return_weighted_graph(g)
 
 
-# ---MAIN---
+# --------------------------------------------------- MAIN ---------------------------------------------------------- #
 if __name__ == '__main__':
     cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
     cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
