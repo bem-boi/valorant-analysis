@@ -51,9 +51,9 @@ def setup_graph(graph: graph_file.WeightedGraph,
     if weighted:
         weights = nx.get_edge_attributes(graph_nx, 'weight')
 
-    kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]
+    types = [graph_nx.nodes[k]['type'] for k in graph_nx.nodes]
 
-    colours = [MAP_COLOUR if kind == 'map' else AGENT_COLOUR for kind in kinds]
+    colours = [MAP_COLOUR if type == 'map' else AGENT_COLOUR for type in types]
 
     x_edges = []
     y_edges = []

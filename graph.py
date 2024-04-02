@@ -7,19 +7,19 @@ from plotly.graph_objs import Figure
 
 class _WeightedVertex:
     item: Any
-    kind: str
+    type: str
     neighbours: dict[_WeightedVertex, float]
     role: str
 
-    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], kind: str, role: str = None) -> None:
-        """Initialize a new vertex with the given item and kind and neighbours.
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], type: str, role: str = None) -> None:
+        """Initialize a new vertex with the given item and type and neighbours.
 
         Preconditions:
-            - kind in {'map', 'agent'}
+            - type in {'map', 'agent'}
         """
         self.item = item
         self.neighbours = neighbours
-        self.kind = kind
+        self.type = type
         self.role = role
 
     def degree(self) -> int:
@@ -42,7 +42,7 @@ class WeightedGraph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, kind: str, role: str = None) -> None:
+    def add_vertex(self, item: Any, type: str, role: str = None) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -50,7 +50,7 @@ class WeightedGraph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _WeightedVertex(item, {}, kind, role)
+        self._vertices[item] = _WeightedVertex(item, {}, type, role)
 
     def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -142,7 +142,7 @@ class WeightedGraph:
         >>> g.get_vertex('reyna') is None
         True
         >>> v = g.get_vertex('jett')
-        >>> v.item == 'jett' and v.kind == 'agent' and v.role == 'duelists' and v.neighbours == {}
+        >>> v.item == 'jett' and v.type == 'agent' and v.role == 'duelists' and v.neighbours == {}
         True
         """
         if item in self._vertices:
@@ -158,11 +158,11 @@ class WeightedGraph:
         """
         graph_nx = nx.Graph()
         for v in self._vertices.values():
-            graph_nx.add_node(v.item, kind=v.kind)
+            graph_nx.add_node(v.item, type=v.type)
 
             for u in v.neighbours.keys():
                 if graph_nx.number_of_nodes() < max_vertices:
-                    graph_nx.add_node(u.item, kind=u.kind)
+                    graph_nx.add_node(u.item, type=u.type)
 
                 if u.item in graph_nx.nodes:
                     graph_nx.add_edge(v.item, u.item, weight=v.neighbours[u])
@@ -441,7 +441,7 @@ def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
     """
     list_of_compatible = {}
     for u in graph.get_neighbours(agent):
-        if u not in list_of_compatible and u != agent and graph.get_vertex(u).kind == 'agent':
+        if u not in list_of_compatible and u != agent and graph.get_vertex(u).type == 'agent':
             list_of_compatible[u] = graph.get_weight(u, agent)
 
     sorted_compatible = dict(sorted(list_of_compatible.items(), key=lambda item: item[1], reverse=True))
