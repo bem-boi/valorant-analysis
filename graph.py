@@ -78,6 +78,16 @@ class WeightedGraph:
 
         Preconditions:
             - item1 and item2 are vertices in this graph
+
+        >>> g = WeightedGraph()
+        >>> g.add_vertex('jett', 'agent', 'duelists')
+        >>> g.add_vertex('reyna', 'agent', 'duelists')
+        >>> g.add_vertex('neon', 'agent', 'duelists')
+        >>> g.add_edge('jett', 'reyna', 2)
+        >>> g.get_weight('jett', 'neon')
+        0
+        >>> g.get_weight('reyna', 'jett')
+        2
         """
         if not self.adjacent(item1, item2):
             return 0
@@ -113,12 +123,27 @@ class WeightedGraph:
     def check_exists(self, item: Any) -> bool:
         """
         Return whether item is in self
+
+        >>> g = WeightedGraph()
+        >>> g.add_vertex('jett', 'agent', 'duelists')
+        >>> g.check_exists('jett')
+        True
+        >>> g.check_exists('reyna')
+        False
         """
         return item in self._vertices
 
     def get_vertex(self, item: Any) -> _WeightedVertex | None:
         """
         Return the vertex with value item or None if item is not in self
+
+        >>> g = WeightedGraph()
+        >>> g.add_vertex('jett', 'agent', 'duelists')
+        >>> g.get_vertex('reyna') is None
+        True
+        >>> v = g.get_vertex('jett')
+        >>> v.item == 'jett' and v.kind == 'agent' and v.role == 'duelists' and v.neighbours == {}
+        True
         """
         if item in self._vertices:
             return self._vertices[item]
@@ -130,8 +155,6 @@ class WeightedGraph:
 
         max_vertices specifies the maximum number of vertices that can appear in the graph.
         (This is necessary to limit the visualization output for large graphs.)
-
-        Note that this method is provided for you, and you shouldn't change it.
         """
         graph_nx = nx.Graph()
         for v in self._vertices.values():
@@ -152,20 +175,29 @@ class WeightedGraph:
 
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
-    Return a dictionary
+    Return a dictionary where the keys are the agent names and the values are the type of role (e.g. duelists)
+    from the file being referred to by agent_role
+
+    Preconditions:
+        - agent_role is a path to a csv file and each row in this file is in the format: Agent_Name,Role
     """
-    agent = {}
+    agent_roles = {}
     with open(agent_role, 'r') as file:
         next(file)
         reader = csv.reader(file)
         for row in reader:
-            agent[row[0].lower()] = row[1].lower()
-    return agent
+            agent_roles[row[0].lower()] = row[1].lower()
+    return agent_roles
 
 
 def load_agent_combo_data(all_agents: str) -> list[set]:
     """
     Return a list of agent combinations, where an agent combination is a set of the agent names in combination
+    from the file being referred to by all_agents
+
+    Preconditions:
+        - all_agents is a path to a csv file where each row in this file is a list of agent names
+          (that were played together by a professional team)
     """
     agent_combs = []
     with open(all_agents, 'r') as file:
@@ -187,9 +219,9 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
     {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played, role]}
 
     Preconditions:
-        - Each row in the csv referred to by agent_pick_rates is in the format:
+        - agent_pick_rates is a path to a csv file, each row of which is in the format:
             [Map,Agent,Pick Rate]
-        - Each row in the csv referred to by teams_picked_agent is in the format:
+        - teams_pick_rates is a path to a csv file, each row of which  is in the format:
             [Map,Agent Picked,Total Wins By Map,Total Maps Played]
     """
     map_ref = {}  # {map_name: agent_ref} and agent_ref in format
@@ -199,7 +231,8 @@ def load_map_agent_data(agent_pick_rates: str, teams_picked_agent: str, agent_ro
         reader = csv.reader(file)
         for row in reader:
             if row[0] not in map_ref:  # if the map is not in map_ref
-                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0, agent_roles[row[1]]]}  # define new map in map_ref & new agent_ref for it
+                map_ref[row[0]] = {row[1]: [float(row[2]), 1, 0, 0, agent_roles[row[1]]]}
+                # define new map in map_ref & new agent_ref for it
             elif row[1] not in map_ref[row[0]]:  # if the agent is not in the agent_ref of this map key
                 map_ref[row[0]][row[1]] = [float(row[2]), 1, 0, 0, agent_roles[row[1]]]  # create a new agent_ref for it
             else:  # the map is already in map_ref and the agent is already in its agent_ref
@@ -230,12 +263,12 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
       This acts as a measure for how good an agent is for a particular map (weight will be between 0 and 15)
 
     - If view_agent_weights is True, then add edges between agents whose weight is a score for how often they are played
-        together in professional play
+      together in professional play
 
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
         where agent_ref is in the format {agent_name: [sum_pick_rate, total_wins, total_played]}
-        - role in agent_role.values()
+        - role is in {'duelists', 'controllers', 'initiators', 'sentinels', None}
         - cu_map in {'ascent', 'pearl', 'split', 'lotus', 'icebox', 'fracture', 'bind', 'haven', 'all'}
     """
     g = WeightedGraph()
@@ -276,16 +309,28 @@ def add_agent_combo(agent_combination: set, g: WeightedGraph):
     """
     Update the weights of all agent pairs in agent_combination to the graph g.
     If any agent pair doesn't exist in g, add it to g.
+
+    >>> g = WeightedGraph()
+    >>> g.add_vertex('jett', 'agent', 'duelists')
+    >>> g.add_vertex('reyna', 'agent', 'duelists')
+    >>> g.add_vertex('neon', 'agent', 'duelists')
+    >>> add_agent_combo({'jett', 'reyna'}, g)
+    >>> add_agent_combo({'jett', 'reyna', 'neon'}, g)
+    >>> g.get_weight('jett', 'reyna')
+    2
+    >>> g.get_weight('jett', 'neon')
+    1
     """
-    for agent1 in agent_combination:
-        for agent2 in agent_combination:
-            v1, v2 = g.get_vertex(agent1), g.get_vertex(agent2)
+    agent_combs = list(agent_combination)
+    for i in range(len(agent_combs)):
+        for j in range(1, len(agent_combs)):
+            v1, v2 = g.get_vertex(agent_combs[i]), g.get_vertex(agent_combs[j])
             if v1 and v2:
-                if not g.adjacent(agent1, agent2):
-                    g.add_edge(agent1, agent2, 1)
+                if not g.adjacent(agent_combs[i], agent_combs[j]):
+                    g.add_edge(agent_combs[i], agent_combs[j], 1)
                 else:
-                    v1.neighbours[[u2 for u2 in v1.neighbours if u2.item == agent2][0]] += 1
-                    v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent1][0]] += 1
+                    v1.neighbours[[u2 for u2 in v1.neighbours if u2.item == agent_combs[j]][0]] += 1
+                    v2.neighbours[[u1 for u1 in v2.neighbours if u1.item == agent_combs[i]][0]] += 1
 
 
 def clean_agents_pick_file(file_path: str) -> str:
@@ -358,19 +403,19 @@ def clean_all_agents_file(file_path: str) -> str:
 
 def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, role: str = '') -> dict[str: float]:
     """
-
+    Returns a dictionary of agents and the score (that is between 0 and 15) of how good the agent is for that map
     :param role: role the player wants to play
     :param teammate: what agents are your teammates playing
     :param graph: Weighted graph where all the data is being held
     :param map_played: the current map being played (input from user)
-    :return: returns a dictionary of agents and the score from 0-15 of how good the agent is for that map
 
-    >>> cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
-    >>> cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
-    >>> agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
-
-    >>> map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
-    >>> g = generate_weighted_graph(map_agent_data)
+    >>> cleaned_agf = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
+    >>> cleaned_tpa = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
+    >>> cleaned_aa = clean_all_agents_file('graph_data/all_agents.csv')
+    >>> agent_role_dat = load_agent_role_data('graph_data/agent_roles.csv')
+    >>> map_agent_dat = load_map_agent_data(cleaned_agf, cleaned_tpa, agent_role_dat)
+    >>> agent_combos = load_agent_combo_data(cleaned_aa)
+    >>> g = generate_weighted_graph(map_agent_dat, agent_combos)
     >>> list(best_agent_for_map(g, 'lotus', ['raze', 'yoru', 'jett', 'iso'], 'duelists').keys())
     ['neon', 'reyna', 'phoenix']
     """
@@ -386,11 +431,8 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
 
 def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
     """
-    returns a dict of compatible agents (the most played combination) with the chosen agent.
-    :param graph:
-    :param map_played:
-    :param agent:
-    :return:
+    Return a dictionary of compatible agents (the most played combination) with the chosen agent.
+
     """
     list_of_compatible = {}
     for u in graph.get_neighbours(agent):
