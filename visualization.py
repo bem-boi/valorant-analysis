@@ -14,6 +14,7 @@ We amended this source code from ex4_visualization.py
 """
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
+from typing import Any
 
 import graph as graph_file
 
@@ -31,14 +32,10 @@ MAP_COLOUR = 'rgb(89, 205, 105)'
 AGENT_COLOUR = 'rgb(105, 89, 205)'
 
 
-def setup_graph(graph: graph_file.WeightedGraph,
-                layout: str = 'spring_layout',
-                max_vertices: int = 5000,
-                weighted: bool = False) -> list:
-    """Use plotly and networkx to setup the visuals for the given graph.
-
-    Optional arguments:
-        - weighted: True when weight data should be visualized
+def setup_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_layout',
+                         max_vertices: int = 5000) -> list:
+    """
+    Use plotly and networkx to set up the visuals for the given graph.
     """
 
     graph_nx = graph.to_networkx(max_vertices)
@@ -48,8 +45,7 @@ def setup_graph(graph: graph_file.WeightedGraph,
     x_values = [pos[k][0] for k in graph_nx.nodes]
     y_values = [pos[k][1] for k in graph_nx.nodes]
     labels = list(graph_nx.nodes)
-    if weighted:
-        weights = nx.get_edge_attributes(graph_nx, 'weight')
+    weights = nx.get_edge_attributes(graph_nx, 'weight')
 
     types = [graph_nx.nodes[k]['type'] for k in graph_nx.nodes]
 
@@ -64,8 +60,7 @@ def setup_graph(graph: graph_file.WeightedGraph,
         x_edges += [x1, x2, None]
         y1, y2 = pos[edge[0]][1], pos[edge[1]][1]
         y_edges += [y1, y2, None]
-        if weighted:
-            weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, weights[(edge[0], edge[1])]))
+        weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, weights[(edge[0], edge[1])]))
 
     trace3 = Scatter(x=x_edges,
                      y=y_edges,
@@ -90,26 +85,7 @@ def setup_graph(graph: graph_file.WeightedGraph,
 
     data = [trace3, trace4]
 
-    if weighted:
-        return [weight_positions, data]
-    else:
-        return data
-
-
-def visualize_graph(graph: graph_file.WeightedGraph,
-                    layout: str = 'spring_layout',
-                    max_vertices: int = 5000,
-                    output_file: str = '') -> None:
-    """Use plotly and networkx to visualize the given graph.
-
-    Optional arguments:
-        - layout: which graph layout algorithm to use
-        - max_vertices: the maximum number of vertices that can appear in the graph
-        - output_file: a filename to save the plotly image to (rather than displaying
-            in your web browser)
-    """
-
-    draw_graph(setup_graph(graph, layout, max_vertices), output_file)
+    return [weight_positions, data]
 
 
 def visualize_weighted_graph(graph: graph_file.WeightedGraph,
@@ -125,34 +101,40 @@ def visualize_weighted_graph(graph: graph_file.WeightedGraph,
             in your web browser)
     """
 
-    weight_positions, data = setup_graph(graph, layout, max_vertices, True)
-    draw_graph(data, output_file, weight_positions)
+    weight_positions, data = setup_weighted_graph(graph, layout, max_vertices)
+    draw_weighted_graph(data, output_file, weight_positions)
 
 
-def return_weighted_graph(graph: graph_file.WeightedGraph,
-                             layout: str = 'spring_layout',
-                             max_vertices: int = 5000,
-                             output_file: str = '') -> Figure:
+def return_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_layout',
+                          max_vertices: int = 5000) -> Figure:
     """
-
-    :param graph:
-    :param layout:
-    :param max_vertices:
-    :param output_file:
-    :return:
+    Returns the weighted graph given as a Figure class object
     """
-    weight_positions, data = setup_graph(graph, layout, max_vertices, True)
-    return return_graph(data, weight_positions)
+    weight_positions, data = setup_weighted_graph(graph, layout, max_vertices)
+    fig = Figure(data=data)
+    fig.update_layout({'showlegend': False})
+    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
+    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
+
+    for w in weight_positions:
+         fig.add_annotation(
+             x=w[0], y=w[1],  # Text annotation position
+             xref="x", yref="y",  # Coordinate reference system
+             text=w[2],  # Text content
+             showarrow=False  # Hide arrow
+         )
+
+    return fig
 
 
-def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None:
+def draw_weighted_graph(data: list, weight_positions: Any, output_file: str = '') -> None:
     """
-    Draw graph based on given data.
+    Draw a weighted graph based on given data
+    where weight_positions are the weights to draw on edges for a weighted graph
 
     Optional arguments:
         - output_file: a filename to save the plotly image to (rather than displaying
             in your web browser)
-        - weight_positions: weights to draw on edges for a weighted graph
     """
 
     fig = Figure(data=data)
@@ -160,41 +142,15 @@ def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
     fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
 
-    if weight_positions:
-        for w in weight_positions:
-            fig.add_annotation(
-                x=w[0], y=w[1],  # Text annotation position
-                xref="x", yref="y",  # Coordinate reference system
-                text=w[2],  # Text content
-                showarrow=False  # Hide arrow
-            )
+    for w in weight_positions:
+        fig.add_annotation(
+           x=w[0], y=w[1],  # Text annotation position
+            xref="x", yref="y",  # Coordinate reference system
+            text=w[2],  # Text content
+            showarrow=False  # Hide arrow
+        )
 
     if output_file == '':
         fig.show()
     else:
         fig.write_image(output_file)
-
-
-def return_graph(data: list, weight_positions=None) -> Figure:
-    """
-
-    :param data:
-    :param output_file:
-    :param weight_positions:
-    :return:
-    """
-    fig = Figure(data=data)
-    fig.update_layout({'showlegend': False})
-    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
-    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
-
-    if weight_positions:
-        for w in weight_positions:
-            fig.add_annotation(
-                x=w[0], y=w[1],  # Text annotation position
-                xref="x", yref="y",  # Coordinate reference system
-                text=w[2],  # Text content
-                showarrow=False  # Hide arrow
-            )
-
-    return fig

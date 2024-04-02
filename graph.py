@@ -451,10 +451,8 @@ def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
 def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
     """
     Visualize the graph g
-    If file_name is given, save the visualization in a file with name file_name after visualizing
-    :param g:
-    :param file_name:
-    :return:
+    Optional argument:
+        - output_file: a filename to save the plotly image to (in addition to displaying in your web browser)
     """
     from visualization import visualize_weighted_graph
     visualize_weighted_graph(g)
