@@ -12,9 +12,9 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 
 We amended this source code from ex4_visualization.py
 """
+from typing import Any
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
-from typing import Any
 
 from graph import WeightedGraph
 
@@ -47,45 +47,34 @@ def setup_weighted_graph(graph: WeightedGraph, layout: str = 'spring_layout',
     labels = list(graph_nx.nodes)
     weights = nx.get_edge_attributes(graph_nx, 'weight')
 
+    positions = set_weights(graph_nx, pos, weights)
+
     types = [graph_nx.nodes[k]['type'] for k in graph_nx.nodes]
 
     colours = [MAP_COLOUR if vertex_type == 'map' else AGENT_COLOUR for vertex_type in types]
 
-    x_edges = []
-    y_edges = []
-    weight_positions = []
-
-    for edge in graph_nx.edges:
-        x1, x2 = pos[edge[0]][0], pos[edge[1]][0]
-        x_edges += [x1, x2, None]
-        y1, y2 = pos[edge[0]][1], pos[edge[1]][1]
-        y_edges += [y1, y2, None]
-        weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, weights[(edge[0], edge[1])]))
-
-    trace3 = Scatter(x=x_edges,
-                     y=y_edges,
+    trace3 = Scatter(x=positions[0],
+                     y=positions[1],
                      mode='lines+text',
                      name='edges',
-                     line=dict(color=LINE_COLOUR, width=1),
+                     line={"color": LINE_COLOUR, "width": 1},
                      )
 
     trace4 = Scatter(x=x_values,
                      y=y_values,
                      mode='markers',
                      name='nodes',
-                     marker=dict(symbol='circle-dot',
-                                 size=5,
-                                 color=colours,
-                                 line=dict(color=VERTEX_BORDER_COLOUR, width=0.5)
-                                 ),
+                     marker={"symbol": 'circle-dot',
+                             "size": 5,
+                             "color": colours,
+                             "line": {"color": VERTEX_BORDER_COLOUR, "width": 0.5}
+                             },
                      text=labels,
                      hovertemplate='%{text}',
                      hoverlabel={'namelength': 0}
                      )
 
-    data = [trace3, trace4]
-
-    return [weight_positions, data]
+    return [positions[2], [trace3, trace4]]
 
 
 def visualize_weighted_graph(graph: WeightedGraph,
@@ -102,7 +91,7 @@ def visualize_weighted_graph(graph: WeightedGraph,
     """
 
     weight_positions, data = setup_weighted_graph(graph, layout, max_vertices)
-    draw_weighted_graph(data, output_file, weight_positions)
+    draw_weighted_graph(data, weight_positions, output_file)
 
 
 def return_weighted_graph(graph: WeightedGraph, layout: str = 'spring_layout',
@@ -117,12 +106,12 @@ def return_weighted_graph(graph: WeightedGraph, layout: str = 'spring_layout',
     fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
 
     for w in weight_positions:
-         fig.add_annotation(
-             x=w[0], y=w[1],  # Text annotation position
-             xref="x", yref="y",  # Coordinate reference system
-             text=w[2],  # Text content
-             showarrow=False  # Hide arrow
-         )
+        fig.add_annotation(
+            x=w[0], y=w[1],  # Text annotation position
+            xref="x", yref="y",  # Coordinate reference system
+            text=w[2],  # Text content
+            showarrow=False  # Hide arrow
+        )
 
     return fig
 
@@ -144,7 +133,7 @@ def draw_weighted_graph(data: list, weight_positions: Any, output_file: str = ''
 
     for w in weight_positions:
         fig.add_annotation(
-           x=w[0], y=w[1],  # Text annotation position
+            x=w[0], y=w[1],  # Text annotation position
             xref="x", yref="y",  # Coordinate reference system
             text=w[2],  # Text content
             showarrow=False  # Hide arrow
@@ -154,3 +143,32 @@ def draw_weighted_graph(data: list, weight_positions: Any, output_file: str = ''
         fig.show()
     else:
         fig.write_image(output_file)
+
+
+def set_weights(g: nx.Graph, pos: Any, weights: dict) -> tuple:
+    """
+    Helper function for setup_weighted_graph to calculate the position of the edges and their weights
+    """
+    x_edges = []
+    y_edges = []
+    weight_positions = []
+
+    for edge in g.edges:
+        x1, x2 = pos[edge[0]][0], pos[edge[1]][0]
+        x_edges += [x1, x2, None]
+        y1, y2 = pos[edge[0]][1], pos[edge[1]][1]
+        y_edges += [y1, y2, None]
+        weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, weights[(edge[0], edge[1])]))
+    return x_edges, y_edges, weight_positions
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'extra-imports': ['networkx', 'plotly.graph_objs', 'graph'],
+        'max-nested-blocks': 5
+    })

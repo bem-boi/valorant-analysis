@@ -1,4 +1,5 @@
-"""
+"""Valorant Map-Agent Weighted Graph File
+
 This python module contains classes and functions to represent and generate
 weighted graphs of Valorant map and agent data
 
@@ -230,6 +231,7 @@ def load_map_agent_data(agent_pick_rates: str, teams_agent_file: str, agent_role
             [Map,Agent,Pick Rate]
         - teams_agent_file is a path to a csv file, each row of which  is in the format:
             [Map,Agent Picked,Total Wins By Map,Total Maps Played]
+        - agent_roles is in the format {agent_name:role}
     """
     map_ref = {}  # {map_name: agent_ref} and agent_ref in format
     # {agent_name: [sum_pick_rate_so_far, count_pick_rate_so_far, total_wins_so_far, total_played_so_far]}
@@ -277,7 +279,8 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
         where agent_ref is in the format {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played, role]}
-        - role is in {'duelists', 'controllers', 'initiators', 'sentinels', None}
+        - Each item in agent_combos is a set containing only valid agent names
+        - role in {'duelists', 'controllers', 'initiators', 'sentinels', None}
         - cu_map in {'ascent', 'pearl', 'split', 'lotus', 'icebox', 'fracture', 'bind', 'haven', 'all'}
     """
     g = WeightedGraph()
@@ -308,7 +311,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
 
 def calc_map_agent_weight(data: list) -> float:
     """
-    Return the weight for the map-agent edge based on data and the formula given and explained in the docstring of
+    Return the weight for the map-agent edge based on data and the formula given and explained in the docstring of the
     generate_weighted_graph() function
 
     Preconditions:
@@ -324,8 +327,9 @@ def calc_map_agent_weight(data: list) -> float:
 
 def add_agent_combo(agent_combination: set, g: WeightedGraph) -> None:
     """
-    Update the weights of all agent pairs in agent_combination to the graph g.
-    If any agent pair doesn't exist in g, add it to g.
+    Update the weights of all agent pairs in agent_combination to the graph g (increment by 1).
+    If any agent pair doesn't exist in g, add it to g (with a weight of 1).
+    If an agent in agent_combination doesn't exist in g, don't do anything
 
     >>> g = WeightedGraph()
     >>> g.add_vertex('jett', 'agent', 'duelists')
@@ -337,6 +341,9 @@ def add_agent_combo(agent_combination: set, g: WeightedGraph) -> None:
     2
     >>> g.get_weight('jett', 'neon')
     1
+
+    Preconditions:
+        - Every item in agent_combination is a valid agent name
     """
     agent_combs = list(agent_combination)
     for i in range(len(agent_combs)):
@@ -420,13 +427,17 @@ def clean_all_agents_file(file_path: str) -> str:
 
 
 # ------------------------------------------ FUNCTIONS FOR VISUALIZATION -------------------------------------------- #
-def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, role: str = '') -> dict[str: float]:
+def best_agent_for_map(graph: WeightedGraph, map_played: str, teammates: list, role: str = '') -> dict[str: float]:
     """
     Returns a dictionary of agents and the score (that is between 0 and 15) of how good the agent is for that map
-    :param role: role the player wants to play
-    :param teammate: what agents are your teammates playing
-    :param graph: Weighted graph where all the data is being held
-    :param map_played: the current map being played (input from user)
+    in the format {agent_name: score} (where score is weight between agent_name and map_played), computing from graph,
+    in descending order of score
+    where teammates is a list of what agents the player's teammates are playing
+    and map played is the current map being played (input from user)
+
+    Optional arguments:
+        - role: the type of agent (role) that the player wants to play; leaving it blank means all roles will be
+          considered
 
     >>> cleaned_agf = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
     >>> cleaned_tpa = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
@@ -441,7 +452,7 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
 
     agent_and_score = {}
     for agent in graph.get_neighbours(map_played):
-        if agent not in teammate and (not role or graph.get_vertex(agent).role == role):
+        if agent not in teammates and (not role or graph.get_vertex(agent).role == role):
             agent_and_score[agent] = graph.get_weight(agent, map_played)
 
     sorted_agent_and_score = dict(sorted(agent_and_score.items(), key=lambda item: item[1], reverse=True))
@@ -450,8 +461,12 @@ def best_agent_for_map(graph: WeightedGraph, map_played: str, teammate: list, ro
 
 def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
     """
-    Return a dictionary of compatible agents (the most played combination) with the chosen agent.
+    Return a dictionary of compatible agents (the most played combination) with the chosen agent,
+    in the format {agent_name: score} (where score is the weight between an agent and agent),
+    in descending order of score
 
+    Preconditions:
+        - graph.check
     """
     list_of_compatible = {}
     for u in graph.get_neighbours(agent):
@@ -464,7 +479,8 @@ def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
 
 def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
     """
-    Visualize the graph g
+    Displays the weighted graph g in your web browser
+
     Optional argument:
         - output_file: a filename to save the plotly image to (in addition to displaying in your web browser)
     """
@@ -476,8 +492,10 @@ def visualize_graph(g: WeightedGraph, file_name: str = '') -> None:
 
 def visualize_agent_graph(agents_roles: dict, map_ref: dict, agent_combos: list, role: str = '') -> None:
     """
-    Visualize a graph of agents of type role only and maps.
-    If role is an empty string, then visualize graphs for all roles
+    Display a graph of agents of type role only and maps in your browser.
+
+    Optional arguments:
+        - role: If left as an empty string, then display a graph for each role
     """
     from visualization import visualize_weighted_graph
     if role:
@@ -493,6 +511,9 @@ def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str,
                  view_agent_weights: bool = False) -> Figure:
     """
     Return a weighted graph from the following data as a Figure class object
+
+    Optional arguments:
+        - view_agent_weights: hide or show the weights of agent-agent edges
     """
     from visualization import return_weighted_graph
     if not view_agent_weights:
@@ -546,7 +567,6 @@ if __name__ == '__main__':
 
     python_ta.check_all(config={
         'max-line-length': 120,
-        'disable': ['E1136', 'W0221'],
         'extra-imports': ['csv', 'networkx', 'plotly.graph_objs', 'visualization'],
         'allowed-io': ['clean_agents_pick_file', 'clean_teams_picked_agents_file', 'clean_all_agents_file',
                        'load_agent_role_data', 'load_agent_combo_data', 'load_map_agent_data'],
