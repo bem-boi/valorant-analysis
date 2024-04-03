@@ -3,7 +3,7 @@ trees r slay
 """
 from __future__ import annotations
 from typing import Any, Optional, TextIO
-from igraph import Graph, EdgeSeq
+from igraph import Graph
 import plotly.graph_objects as go
 from plotly.graph_objs import Figure
 
@@ -439,7 +439,7 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     """
     Returns a tree from the following data given as a Figure class object
     """
-    id = 0
+    i_d = 0
     g = Graph(directed=True)
     g.add_vertex('VCT')
     g.add_vertex('VCT 2021')
@@ -451,31 +451,31 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     for game in data1:
         name_of_match = list(game.keys())[0]
         maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(id))
-        for map in maps:
-            g.add_vertex(map + ' id: ' + str(id))
-            team_name = list(game[name_of_match][map])
+        g.add_vertex(name_of_match + ' id: ' + str(i_d))
+        for m in maps:
+            g.add_vertex(m + ' id: ' + str(i_d))
+            team_name = list(game[name_of_match][m])
             team1 = team_name[0]
             team2 = team_name[1]
-            team1attack, team1defend = (list(game[name_of_match][map].values())[0][0],
-                                        list(game[name_of_match][map].values())[0][1])
-            team2attack, team2defend = (list(game[name_of_match][map].values())[1][0],
-                                        list(game[name_of_match][map].values())[1][1])
-            g.add_vertex(team1 + ' id: ' + str(id))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
-            g.add_edge(team1 + ' id: ' + str(id), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
-            g.add_edge(team1 + ' id: ' + str(id), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
-            g.add_vertex(team2 + ' id: ' + str(id))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
-            g.add_edge(team2 + ' id: ' + str(id), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
-            g.add_edge(team2 + ' id: ' + str(id), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), team1 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), team2 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), name_of_match + ' id: ' + str(id))
-        g.add_edge(name_of_match + ' id: ' + str(id), 'VCT 2021')
-        id += 1
+            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
+                                        list(game[name_of_match][m].values())[0][1])
+            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
+                                        list(game[name_of_match][m].values())[1][1])
+            g.add_vertex(team1 + ' id: ' + str(i_d))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
+            g.add_edge(team1 + ' id: ' + str(i_d), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
+            g.add_edge(team1 + ' id: ' + str(i_d), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
+            g.add_vertex(team2 + ' id: ' + str(i_d))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
+            g.add_edge(team2 + ' id: ' + str(i_d), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
+            g.add_edge(team2 + ' id: ' + str(i_d), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
+            g.add_edge(m + ' id: ' + str(i_d), team1 + ' id: ' + str(i_d))
+            g.add_edge(m + ' id: ' + str(i_d), team2 + ' id: ' + str(i_d))
+            g.add_edge(m + ' id: ' + str(i_d), name_of_match + ' id: ' + str(i_d))
+        g.add_edge(name_of_match + ' id: ' + str(i_d), 'VCT 2021')
+        i_d += 1
 
     layt = g.layout("rt")
 
@@ -527,8 +527,10 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     return fig
 
 
-def create_tree_from_edges(edges) -> Graph:
-    """"""
+def create_tree_from_edges(edges: Any) -> Graph:
+    """
+    Returns a tree with the given edges as an igraph Graph object
+    """
 
     # from igraph import plot (NO need; igraph already imported at top)
     # import cairocffi
@@ -546,40 +548,31 @@ def create_tree_from_edges(edges) -> Graph:
 
 # --------------------------------------------------- MAIN ---------------------------------------------------------- #
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/testy_test.txt')
-    game_file_2022 = open('tree_data/testy_test.txt')
-    game_file_2023 = open('tree_data/testy_test.txt')
+    game_datas = []
+    game_trees, eco_trees = [], []
+    for x in range(1, 4):
+        with open('tree_data/testy_test.txt') as game_file:
+            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/maps_scores_202' + str(x) + '.csv'
+            game_dat = read_game(game_file)
 
-    eco_file_2021 = open('tree_data/testy_test_eco.txt')
-    eco_file_2022 = open('tree_data/testy_test_eco.txt')
-    eco_file_2023 = open('tree_data/testy_test_eco.txt')
+        with open('tree_data/testy_test_eco.txt') as eco_file:
+            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/eco_rounds_202' + str(x) + '.csv'
+            eco_dat = read_buy_type(eco_file)
 
-    game_data_2021 = read_game(game_file_2021)
-    game_data_2022 = read_game(game_file_2022)
-    game_data_2023 = read_game(game_file_2023)
-
-    eco_data_2021 = read_buy_type(eco_file_2021)
-    eco_data_2022 = read_buy_type(eco_file_2022)
-    eco_data_2023 = read_buy_type(eco_file_2023)
-
-    game_tree_2021 = generate_tree(game_data_2021)
-    game_tree_2022 = generate_tree(game_data_2022)
-    game_tree_2023 = generate_tree(game_data_2023)
-
-    eco_tree_2021 = generate_tree(eco_data_2021)
-    eco_tree_2022 = generate_tree(eco_data_2022)
-    eco_tree_2023 = generate_tree(eco_data_2023)
+        game_datas.append(game_dat)
+        game_trees.append(generate_tree(game_dat))
+        eco_trees.append(generate_tree(eco_dat))
 
     vct_tree = Tree('VCT', [])
-    vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
+    vct_tree.combine_all(game_trees)
 
     eco_tree = Tree('VCT buy types', [])
-    eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
+    eco_tree.combine_all(eco_trees)
 
     # current_map = input("What map are you playing?").lower()
     # print("This map is " + vct_tree.best_side_for_map(current_map))
     # print(eco_tree.best_buy_for_map(current_map))
-    visualizetree(game_data_2021[1], game_data_2022[1], game_data_2023[1])
+    visualizetree(game_datas[0][1], game_datas[0][1], game_datas[0][1])
 
     import doctest
 
