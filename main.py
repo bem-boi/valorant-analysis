@@ -4,7 +4,7 @@ from graph import (clean_agents_pick_file, clean_teams_picked_agents_file, load_
                    generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data,
                    compatible_agents, best_agent_for_map)
 
-from tree import visualizetree, read_game, read_buy_type, generate_tree, Tree
+from tree import visualize_tree, read_game, read_buy_type, generate_tree, Tree
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -109,7 +109,7 @@ def render_content(tab):
                  'fracture',
                  'bind',
                  'haven', 'all'], 'ascent', inline=True, id='choice2_2'),
-            dcc.Graph(figure=visualizetree(game_data_2021[1], game_data_2022[1], game_data_2023[1]))
+            dcc.Graph(figure=visualize_tree(game_data_2021[1], game_data_2022[1], game_data_2023[1]))
         ])
     elif tab == 'tab-3':
         return html.Div([
