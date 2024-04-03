@@ -439,21 +439,18 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     """
     Returns a tree from the following data given as a Figure class object
     """
-    id = 0
+    idlol = 0
     g = Graph(directed=True)
     g.add_vertex('VCT')
     g.add_vertex('VCT 2021')
-    # g.add_vertex('VCT 2022')
-    # g.add_vertex('VCT 2023')
     g.add_edge('VCT', 'VCT 2021')
-    # g.add_edge('VCT', 'VCT 2022')
-    # g.add_edge('VCT', 'VCT 2023')
     for game in data1:
         name_of_match = list(game.keys())[0]
         maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(id))
+        g.add_vertex(name_of_match + ' id: ' + str(idlol))
+        g.add_edge(name_of_match + ' id: ' + str(idlol), 'VCT 2021')
+        name_of_match_id = idlol
         for map in maps:
-            g.add_vertex(map + ' id: ' + str(id))
             team_name = list(game[name_of_match][map])
             team1 = team_name[0]
             team2 = team_name[1]
@@ -461,23 +458,102 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
                                         list(game[name_of_match][map].values())[0][1])
             team2attack, team2defend = (list(game[name_of_match][map].values())[1][0],
                                         list(game[name_of_match][map].values())[1][1])
-            g.add_vertex(team1 + ' id: ' + str(id))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
-            g.add_edge(team1 + ' id: ' + str(id), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
-            g.add_edge(team1 + ' id: ' + str(id), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
-            g.add_vertex(team2 + ' id: ' + str(id))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
-            g.add_edge(team2 + ' id: ' + str(id), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
-            g.add_edge(team2 + ' id: ' + str(id), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), team1 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), team2 + ' id: ' + str(id))
-            g.add_edge(map + ' id: ' + str(id), name_of_match + ' id: ' + str(id))
-        g.add_edge(name_of_match + ' id: ' + str(id), 'VCT 2021')
-        id += 1
+            idlol += 1
+            team1_id = idlol
+            g.add_vertex(team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            idlol += 1
+            team2_id = idlol
+            g.add_vertex(team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            idlol += 1
+            g.add_vertex(map + ' id: ' + str(idlol))
+            g.add_edge(map + ' id: ' + str(idlol), team1 + ' id: ' + str(team1_id))
+            g.add_edge(map + ' id: ' + str(idlol), team2 + ' id: ' + str(team2_id))
+            g.add_edge(map + ' id: ' + str(idlol), name_of_match + ' id: ' + str(name_of_match_id))
+        idlol += 1
 
-    layt = g.layout("rt")
+    g.add_vertex('VCT 2022')
+    g.add_edge('VCT', 'VCT 2022')
+    for game in data1:
+        name_of_match = list(game.keys())[0]
+        maps = list(game[name_of_match].keys())
+        g.add_vertex(name_of_match + ' id: ' + str(idlol))
+        g.add_edge(name_of_match + ' id: ' + str(idlol), 'VCT 2022')
+        name_of_match_id = idlol
+        for map in maps:
+            team_name = list(game[name_of_match][map])
+            team1 = team_name[0]
+            team2 = team_name[1]
+            team1attack, team1defend = (list(game[name_of_match][map].values())[0][0],
+                                        list(game[name_of_match][map].values())[0][1])
+            team2attack, team2defend = (list(game[name_of_match][map].values())[1][0],
+                                        list(game[name_of_match][map].values())[1][1])
+            idlol += 1
+            team1_id = idlol
+            g.add_vertex(team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            idlol += 1
+            team2_id = idlol
+            g.add_vertex(team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            idlol += 1
+            g.add_vertex(map + ' id: ' + str(idlol))
+            g.add_edge(map + ' id: ' + str(idlol), team1 + ' id: ' + str(team1_id))
+            g.add_edge(map + ' id: ' + str(idlol), team2 + ' id: ' + str(team2_id))
+            g.add_edge(map + ' id: ' + str(idlol), name_of_match + ' id: ' + str(name_of_match_id))
+        idlol += 1
+
+    g.add_vertex('VCT 2023')
+    g.add_edge('VCT', 'VCT 2023')
+    for game in data1:
+        name_of_match = list(game.keys())[0]
+        maps = list(game[name_of_match].keys())
+        g.add_vertex(name_of_match + ' id: ' + str(idlol))
+        g.add_edge(name_of_match + ' id: ' + str(idlol), 'VCT 2023')
+        name_of_match_id = idlol
+        for map in maps:
+            team_name = list(game[name_of_match][map])
+            team1 = team_name[0]
+            team2 = team_name[1]
+            team1attack, team1defend = (list(game[name_of_match][map].values())[0][0],
+                                        list(game[name_of_match][map].values())[0][1])
+            team2attack, team2defend = (list(game[name_of_match][map].values())[1][0],
+                                        list(game[name_of_match][map].values())[1][1])
+            idlol += 1
+            team1_id = idlol
+            g.add_vertex(team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(idlol))
+            g.add_edge(team1 + ' id: ' + str(idlol), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(idlol))
+            idlol += 1
+            team2_id = idlol
+            g.add_vertex(team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(idlol))
+            g.add_edge(team2 + ' id: ' + str(idlol), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(idlol))
+            idlol += 1
+            g.add_vertex(map + ' id: ' + str(idlol))
+            g.add_edge(map + ' id: ' + str(idlol), team1 + ' id: ' + str(team1_id))
+            g.add_edge(map + ' id: ' + str(idlol), team2 + ' id: ' + str(team2_id))
+            g.add_edge(map + ' id: ' + str(idlol), name_of_match + ' id: ' + str(name_of_match_id))
+        idlol += 1
+
+    layt = g.layout("kk")
 
     edge_x, edge_y = [], []
     for edge in g.get_edgelist():
@@ -523,7 +599,6 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     )
 
     # Show the interactive plot
-    fig.show()
     return fig
 
 
