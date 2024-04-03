@@ -265,20 +265,14 @@ class Tree:
         semi_eco = 0
         semi_buy = 0
         full = 0
+        buy_counts = [0, 0, 0, 0]
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
                 if subtree2._root.lower() == map_played:
                     for subtree3 in subtree2._subtrees:
                         for subtree4 in subtree3._subtrees:
-                            for subtree5 in subtree4._subtrees:
-                                if subtree5._root[1] == 'Eco: 0-5k':
-                                    eco += 1
-                                elif subtree5._root[1] == 'Semi-eco: 5-10k':
-                                    semi_eco += 1
-                                elif subtree5._root[1] == 'Semi-buy: 10-20k':
-                                    semi_buy += 1
-                                else:
-                                    full += 1
+                            update_buy_counts(buy_counts, subtree4)
+
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
             return 'Eco buy is most effective'
@@ -297,6 +291,20 @@ class Tree:
         """
         for tree in trees:
             self._subtrees.append(tree)
+
+    def update_buy_counts(self, buy_counts: list, subtree: Tree) -> None:
+        """
+        Update the counts of each buy type based on subtree
+        """
+        for subtree5 in subtree._subtrees:
+            if subtree5._root[1] == 'Eco: 0-5k':
+                buy_counts[0] += 1
+            elif subtree5._root[1] == 'Semi-eco: 5-10k':
+                buy_counts[1] += 1
+            elif subtree5._root[1] == 'Semi-buy: 10-20k':
+                buy_counts[2] += 1
+            else:
+                buy_counts[3] += 1
 
 
 def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
