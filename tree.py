@@ -271,7 +271,7 @@ class Tree:
                 if subtree2._root.lower() == map_played:
                     for subtree3 in subtree2._subtrees:
                         for subtree4 in subtree3._subtrees:
-                            update_buy_counts(buy_counts, subtree4)
+                            subtree4.update_buy_counts(buy_counts, subtree4)
 
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
