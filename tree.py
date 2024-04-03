@@ -602,8 +602,10 @@ def visualize_tree(data1: list[dict], data2: list[dict], data3: list[dict]) -> F
     return fig
 
 
-def create_tree_from_edges(edges) -> Graph:
-    """"""
+def create_tree_from_edges(edges: Any) -> Graph:
+    """
+    Returns a tree made from the edges given as an igraph Graph object
+    """
 
     # from igraph import plot (NO need; igraph already imported at top)
     # import cairocffi
@@ -621,43 +623,33 @@ def create_tree_from_edges(edges) -> Graph:
 
 # --------------------------------------------------- MAIN ---------------------------------------------------------- #
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/testy_test.txt')
-    game_file_2022 = open('tree_data/testy_test.txt')
-    game_file_2023 = open('tree_data/testy_test.txt')
+    game_datas = []
+    game_trees, eco_trees = [], []
+    for x in range(1, 4):
+        with open('tree_data/testy_test.txt') as game_file:
+            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/maps_scores_202' + str(x) + '.csv'
+            game_dat = read_game(game_file)
 
-    eco_file_2021 = open('tree_data/testy_test_eco.txt')
-    eco_file_2022 = open('tree_data/testy_test_eco.txt')
-    eco_file_2023 = open('tree_data/testy_test_eco.txt')
+        with open('tree_data/testy_test_eco.txt') as eco_file:
+            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/eco_rounds_202' + str(x) + '.csv'
+            eco_dat = read_buy_type(eco_file)
 
-    game_data_2021 = read_game(game_file_2021)
-    game_data_2022 = read_game(game_file_2022)
-    game_data_2023 = read_game(game_file_2023)
-
-    eco_data_2021 = read_buy_type(eco_file_2021)
-    eco_data_2022 = read_buy_type(eco_file_2022)
-    eco_data_2023 = read_buy_type(eco_file_2023)
-
-    game_tree_2021 = generate_tree(game_data_2021)
-    game_tree_2022 = generate_tree(game_data_2022)
-    game_tree_2023 = generate_tree(game_data_2023)
-
-    eco_tree_2021 = generate_tree(eco_data_2021)
-    eco_tree_2022 = generate_tree(eco_data_2022)
-    eco_tree_2023 = generate_tree(eco_data_2023)
+        game_datas.append(game_dat)
+        game_trees.append(generate_tree(game_dat))
+        eco_trees.append(generate_tree(eco_dat))
 
     vct_tree = Tree('VCT', [])
-    vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
+    vct_tree.combine_all(game_trees)
 
     eco_tree = Tree('VCT buy types', [])
-    eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
+    eco_tree.combine_all(eco_trees)
 
     # current_map = input("What map are you playing?").lower()
     # print("This map is " + vct_tree.best_side_for_map(current_map))
     # print(eco_tree.best_buy_for_map(current_map))
-    visualize_tree(game_data_2021[1], game_data_2022[1], game_data_2023[1])
+    visualize_tree(game_datas[0][1], game_datas[0][1], game_datas[0][1])
 
     import doctest
-
     doctest.testmod()
     import python_ta
 
