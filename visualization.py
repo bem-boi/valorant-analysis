@@ -16,7 +16,7 @@ import networkx as nx
 from plotly.graph_objs import Scatter, Figure
 from typing import Any
 
-import graph as graph_file
+from graph import WeightedGraph
 
 # Colours to use when visualizing different clusters.
 COLOUR_SCHEME = [
@@ -32,7 +32,7 @@ MAP_COLOUR = 'rgb(89, 205, 105)'
 AGENT_COLOUR = 'rgb(105, 89, 205)'
 
 
-def setup_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_layout',
+def setup_weighted_graph(graph: WeightedGraph, layout: str = 'spring_layout',
                          max_vertices: int = 5000) -> list:
     """
     Use plotly and networkx to set up the visuals for the given graph.
@@ -49,7 +49,7 @@ def setup_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_
 
     types = [graph_nx.nodes[k]['type'] for k in graph_nx.nodes]
 
-    colours = [MAP_COLOUR if type == 'map' else AGENT_COLOUR for type in types]
+    colours = [MAP_COLOUR if vertex_type == 'map' else AGENT_COLOUR for vertex_type in types]
 
     x_edges = []
     y_edges = []
@@ -88,7 +88,7 @@ def setup_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_
     return [weight_positions, data]
 
 
-def visualize_weighted_graph(graph: graph_file.WeightedGraph,
+def visualize_weighted_graph(graph: WeightedGraph,
                              layout: str = 'spring_layout',
                              max_vertices: int = 5000,
                              output_file: str = '') -> None:
@@ -105,7 +105,7 @@ def visualize_weighted_graph(graph: graph_file.WeightedGraph,
     draw_weighted_graph(data, output_file, weight_positions)
 
 
-def return_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_layout',
+def return_weighted_graph(graph: WeightedGraph, layout: str = 'spring_layout',
                           max_vertices: int = 5000) -> Figure:
     """
     Returns the weighted graph given as a Figure class object

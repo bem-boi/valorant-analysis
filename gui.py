@@ -1,8 +1,8 @@
 from dash import Dash, dcc, html, Input, Output, callback, State, ctx
 
-import graph
-from graph import clean_agents_pick_file, clean_teams_picked_agents_file, load_agent_role_data, load_map_agent_data, \
-    generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data, compatible_agents
+from graph import (clean_agents_pick_file, clean_teams_picked_agents_file, load_agent_role_data, load_map_agent_data,
+                   generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data,
+                   compatible_agents, best_agent_for_map)
 
 from tree import visualizetree, read_game, read_buy_type, generate_tree, Tree
 
@@ -160,11 +160,11 @@ def update_output(choice1, choice2, button, input):
             choice1 = ''
         if input is None:
             agents_so_far += str(
-                list(graph.best_agent_for_map(map_agent_graph, choice2, [], choice1).keys()))
+                list(best_agent_for_map(map_agent_graph, choice2, [], choice1).keys()))
         else:
             teammate_agents = input.split(',')
             agents_so_far += str(
-                list(graph.best_agent_for_map(map_agent_graph, choice2, teammate_agents, choice1).keys()))
+                list(best_agent_for_map(map_agent_graph, choice2, teammate_agents, choice1).keys()))
         return agents_so_far + '. This is ordered in descending suitable score of agents on this map'
     else:
         return ("Please input the agents your teammates are playing. Answer in the form: (Agent1),(Agent2),...,(Agent4)"
