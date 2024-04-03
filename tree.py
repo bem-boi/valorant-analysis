@@ -259,9 +259,7 @@ class Tree:
 
     def best_buy_for_map(self, map_played: str) -> str:
         """
-        TODO: docstring
-        :param map_played:
-        :return:
+        Returns a message stating the type of buy that is best for map_played
         """
         eco = 0
         semi_eco = 0
