@@ -358,14 +358,14 @@ def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     return (year, info)
 
 
-def generate_tree(year: str, data: list[dict]) -> Tree:
+def generate_tree(data: tuple[str, list[dict]]) -> Tree:
     """
     TODO: docstring
     :param data:
     :return:
     """
-    t = Tree('VCT ' + year, [])
-    for game in data:
+    t = Tree(f"VCT {data[0]}", [])
+    for game in data[1]:
         keys = list(game.keys())
         match = keys[0]
         for m_map in game[match]:
@@ -393,13 +393,13 @@ if __name__ == '__main__':
     eco_data_2022 = read_buy_type(eco_file_2022)
     eco_data_2023 = read_buy_type(eco_file_2023)
 
-    game_tree_2021 = generate_tree(game_data_2021[0], game_data_2021[1])
-    game_tree_2022 = generate_tree(game_data_2022[0], game_data_2022[1])
-    game_tree_2023 = generate_tree(game_data_2023[0], game_data_2023[1])
+    game_tree_2021 = generate_tree(game_data_2021)
+    game_tree_2022 = generate_tree(game_data_2022)
+    game_tree_2023 = generate_tree(game_data_2023)
 
-    eco_tree_2021 = generate_tree(eco_data_2021[0], eco_data_2021[1])
-    eco_tree_2022 = generate_tree(eco_data_2022[0], eco_data_2022[1])
-    eco_tree_2023 = generate_tree(eco_data_2023[0], eco_data_2023[1])
+    eco_tree_2021 = generate_tree(eco_data_2021)
+    eco_tree_2022 = generate_tree(eco_data_2022)
+    eco_tree_2023 = generate_tree(eco_data_2023)
 
     vct_tree = Tree('VCT', [])
     vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
