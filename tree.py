@@ -3,6 +3,10 @@ trees r slay
 """
 from __future__ import annotations
 from typing import Any, Optional, TextIO
+import igraph
+from igraph import Graph, EdgeSeq
+import plotly.graph_objects as go
+from plotly.graph_objs import Figure
 
 
 class Tree:
@@ -107,6 +111,29 @@ class Tree:
         Tree(2, [Tree(4, []), Tree(5, [])])
         """
         return f"Tree({self._root}, {self._subtrees})"
+
+    def height(self: Tree) -> int:
+        """Return the height of this tree.
+
+        Please refer to the prep readings for the definition of tree height.
+
+        >>> t1 = Tree(17, [])
+        >>> t1.height()
+        1
+        >>> t2 = Tree(1, [Tree(4, [Tree(5, [])]), Tree(1, [Tree(5, [Tree(5, [])])])])
+        >>> t2.height()
+        4
+        """
+        if self.is_empty():
+            return 0
+        elif self._subtrees == []:
+            return 1
+        else:
+            max_height = 0
+            for subtree in self._subtrees:
+                if subtree.height() > max_height:
+                    max_height = subtree.height()
+            return 1 + max_height
 
     def insert_sequence(self, items: list) -> None:
         """Insert the given items into this tree.
@@ -375,15 +402,151 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
     return t
 
 
+def data_at_height(t: Tree, i: int) -> list:
+    """
+
+    :param t:
+    :param i:
+    :return:
+    >>> t = Tree(1, [Tree(4, [Tree(5, [])]), Tree(1, [Tree(5, [Tree(5, [])])])])
+    >>> data_at_height(t, 2)
+    [5, 5]
+    >>> t2 = Tree(1, [Tree(2, [Tree(4, []),Tree(5, [])]),Tree(3, [Tree(6, []),Tree(7, [])])])
+    >>> data_at_height(t2, 2)
+    [4, 5, 6, 7]
+    """
+    if i == 0:
+        return [t._root] if t._root is not None else []
+    else:
+        nodes = []
+        for subtree in t._subtrees:
+            nodes.extend(data_at_height(subtree, i - 1))
+        return nodes
+
+
+def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
+    """
+
+    :param data:
+    :return:
+    """
+    id = 0
+    g = igraph.Graph(directed=True)
+    g.add_vertex('VCT')
+    g.add_vertex('VCT 2021')
+    # g.add_vertex('VCT 2022')
+    # g.add_vertex('VCT 2023')
+    g.add_edge('VCT', 'VCT 2021')
+    # g.add_edge('VCT', 'VCT 2022')
+    # g.add_edge('VCT', 'VCT 2023')
+    for game in data1:
+        name_of_match = list(game.keys())[0]
+        maps = list(game[name_of_match].keys())
+        g.add_vertex(name_of_match + ' id: ' + str(id))
+        for map in maps:
+            g.add_vertex(map + ' id: ' + str(id))
+            team_name = list(game[name_of_match][map])
+            team1 = team_name[0]
+            team2 = team_name[1]
+            team1attack, team1defend = (list(game[name_of_match][map].values())[0][0],
+                                        list(game[name_of_match][map].values())[0][1])
+            team2attack, team2defend = (list(game[name_of_match][map].values())[1][0],
+                                        list(game[name_of_match][map].values())[1][1])
+            g.add_vertex(team1 + ' id: ' + str(id))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
+            g.add_edge(team1 + ' id: ' + str(id), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(id))
+            g.add_edge(team1 + ' id: ' + str(id), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(id))
+            g.add_vertex(team2 + ' id: ' + str(id))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
+            g.add_edge(team2 + ' id: ' + str(id), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(id))
+            g.add_edge(team2 + ' id: ' + str(id), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(id))
+            g.add_edge(map + ' id: ' + str(id), team1 + ' id: ' + str(id))
+            g.add_edge(map + ' id: ' + str(id), team2 + ' id: ' + str(id))
+            g.add_edge(map + ' id: ' + str(id), name_of_match + ' id: ' + str(id))
+        g.add_edge(name_of_match + ' id: ' + str(id), 'VCT 2021')
+        id += 1
+
+
+    layt = g.layout("rt")
+
+    edge_x, edge_y = [], []
+    for edge in g.get_edgelist():
+        x0, y0 = layt[edge[0]]
+        x1, y1 = layt[edge[1]]
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+
+    # Get vertex coordinates and labels
+    node_x, node_y = zip(*[layt[vertex] for vertex in g.vs.indices])
+    # node_labels = [str(label) for label in g.vs.indices]
+    node_labels = g.vs['name']
+
+    # Create Plotly trace for edges
+    edge_trace = go.Scatter(
+        x=edge_x,
+        y=edge_y,
+        line=dict(width=0.5, color="#888"),
+        hoverinfo="none",
+        mode="lines",
+    )
+
+    # Create Plotly trace for nodes
+    node_trace = go.Scatter(
+        x=node_x,
+        y=node_y,
+        mode="markers",
+        hoverinfo="text",
+        marker=dict(showscale=True, colorscale="YlGnBu", size=10),
+        text=node_labels,  # Display node labels on hover
+    )
+
+    # Create a figure and add traces
+    fig = go.Figure(data=[edge_trace, node_trace])
+
+    # Customize layout
+    fig.update_layout(
+        showlegend=True,
+        hovermode="closest",
+        margin=dict(b=0, l=0, r=0, t=0),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+    )
+
+    # Show the interactive plot
+    fig.show()
+    return fig
+
+
+
+def create_tree_from_edges(edges):
+    from igraph import Graph
+    from igraph import plot
+    import cairocffi
+    # Create an empty directed graph
+    tree = Graph(directed=True)
+    # Add vertices
+    vertices = set()
+    for edge in edges:
+        vertices.update(edge)
+    tree.add_vertices(list(vertices))
+    # Add edges to the graph
+    tree.add_edges(edges)
+    return tree
+
+
+
+
 # ---MAIN---
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/maps_scores_2021.csv')
-    game_file_2022 = open('tree_data/maps_scores_2022.csv')
-    game_file_2023 = open('tree_data/maps_scores_2023.csv')
+    game_file_2021 = open('tree_data/testy_test.txt')
+    game_file_2022 = open('tree_data/testy_test.txt')
+    game_file_2023 = open('tree_data/testy_test.txt')
 
-    eco_file_2021 = open('tree_data/eco_rounds_2021.csv')
-    eco_file_2022 = open('tree_data/eco_rounds_2022.csv')
-    eco_file_2023 = open('tree_data/eco_rounds_2023.csv')
+    eco_file_2021 = open('tree_data/testy_test_eco.txt')
+    eco_file_2022 = open('tree_data/testy_test_eco.txt')
+    eco_file_2023 = open('tree_data/testy_test_eco.txt')
 
     game_data_2021 = read_game(game_file_2021)
     game_data_2022 = read_game(game_file_2022)
@@ -407,6 +570,7 @@ if __name__ == '__main__':
     eco_tree = Tree('VCT buy types', [])
     eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
-    current_map = input("What map are you playing?").lower()
-    print("This map is " + vct_tree.best_side_for_map(current_map))
-    print(eco_tree.best_buy_for_map(current_map))
+    # current_map = input("What map are you playing?").lower()
+    # print("This map is " + vct_tree.best_side_for_map(current_map))
+    # print(eco_tree.best_buy_for_map(current_map))
+    visualizetree(game_data_2021[1], game_data_2022[1], game_data_2023[1])

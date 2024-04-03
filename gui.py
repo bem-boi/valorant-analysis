@@ -4,10 +4,11 @@ import graph
 from graph import clean_agents_pick_file, clean_teams_picked_agents_file, load_agent_role_data, load_map_agent_data, \
     generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data, compatible_agents
 
+from tree import visualizetree, read_game, read_buy_type, generate_tree, Tree
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-# INITIALIZE DATA
+# INITIALIZE DATA FOR GRAPH #
 cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
 cleaned_tpa_file = clean_teams_picked_agents_file('graph_data/teams_picked_agents2023.csv')
 cleaned_aa_file = clean_all_agents_file('graph_data/all_agents.csv')
@@ -15,6 +16,36 @@ agent_role_data = load_agent_role_data('graph_data/agent_roles.csv')
 agent_combinations = load_agent_combo_data(cleaned_aa_file)
 map_agent_data = load_map_agent_data(cleaned_agf_file, cleaned_tpa_file, agent_role_data)
 map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, view_agent_weights=True)
+
+
+# INITIALIZE DATA FOR TREE #
+game_file_2021 = open('tree_data/testy_test.txt')
+game_file_2022 = open('tree_data/testy_test.txt')
+game_file_2023 = open('tree_data/testy_test.txt')
+
+eco_file_2021 = open('tree_data/testy_test_eco.txt')
+eco_file_2022 = open('tree_data/testy_test_eco.txt')
+eco_file_2023 = open('tree_data/testy_test_eco.txt')
+
+game_data_2021 = read_game(game_file_2021)
+game_data_2022 = read_game(game_file_2022)
+game_data_2023 = read_game(game_file_2023)
+
+eco_data_2021 = read_buy_type(eco_file_2021)
+eco_data_2022 = read_buy_type(eco_file_2022)
+eco_data_2023 = read_buy_type(eco_file_2023)
+
+game_tree_2021 = generate_tree(game_data_2021)
+game_tree_2022 = generate_tree(game_data_2022)
+game_tree_2023 = generate_tree(game_data_2023)
+
+eco_tree_2021 = generate_tree(eco_data_2021)
+eco_tree_2022 = generate_tree(eco_data_2022)
+eco_tree_2023 = generate_tree(eco_data_2023)
+
+vct_tree = Tree('VCT', [])
+vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
+
 
 app = Dash(__name__)
 
@@ -77,7 +108,8 @@ def render_content(tab):
                  'icebox',
                  'fracture',
                  'bind',
-                 'haven', 'all'], 'ascent', inline=True, id='choice2_2')
+                 'haven', 'all'], 'ascent', inline=True, id='choice2_2'),
+            dcc.Graph(figure=visualizetree(game_data_2021[1], game_data_2022[1], game_data_2023[1]))
         ])
     elif tab == 'tab-3':
         return html.Div([
