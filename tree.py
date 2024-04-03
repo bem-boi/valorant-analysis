@@ -3,7 +3,6 @@ trees r slay
 """
 from __future__ import annotations
 from typing import Any, Optional, TextIO
-import igraph
 from igraph import Graph, EdgeSeq
 import plotly.graph_objects as go
 from plotly.graph_objs import Figure
@@ -36,6 +35,14 @@ class Tree:
         """
         self._root = root
         self._subtrees = subtrees
+
+    def get_root(self) -> Optional[Any]:
+        """Returns the root of this tree"""
+        return self._root
+
+    def get_subtrees(self) -> Optional[Any]:
+        """Returns the subtrees of this tree"""
+        return self._subtrees
 
     def is_empty(self) -> bool:
         """Return whether this tree is empty.
@@ -404,11 +411,15 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 
 def data_at_height(t: Tree, i: int) -> list:
     """
+    Returns a list of the values of the nodes at depth i of the tree t
+    (the root node is considered to have a depth of 0)
 
-    :param t:
-    :param i:
-    :return:
+    Preconditions:
+        - i >= 0
+
     >>> t = Tree(1, [Tree(4, [Tree(5, [])]), Tree(1, [Tree(5, [Tree(5, [])])])])
+    >>> data_at_height(t, 0)
+    [1]
     >>> data_at_height(t, 2)
     [5, 5]
     >>> t2 = Tree(1, [Tree(2, [Tree(4, []),Tree(5, [])]),Tree(3, [Tree(6, []),Tree(7, [])])])
@@ -416,22 +427,20 @@ def data_at_height(t: Tree, i: int) -> list:
     [4, 5, 6, 7]
     """
     if i == 0:
-        return [t._root] if t._root is not None else []
+        return [t.get_root()] if t.get_root() is not None else []
     else:
         nodes = []
-        for subtree in t._subtrees:
+        for subtree in t.get_subtrees():
             nodes.extend(data_at_height(subtree, i - 1))
         return nodes
 
 
 def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
-
-    :param data:
-    :return:
+    Returns a tree from the following data given as a Figure class object
     """
     id = 0
-    g = igraph.Graph(directed=True)
+    g = Graph(directed=True)
     g.add_vertex('VCT')
     g.add_vertex('VCT 2021')
     # g.add_vertex('VCT 2022')
@@ -468,7 +477,6 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
         g.add_edge(name_of_match + ' id: ' + str(id), 'VCT 2021')
         id += 1
 
-
     layt = g.layout("rt")
 
     edge_x, edge_y = [], []
@@ -487,7 +495,7 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     edge_trace = go.Scatter(
         x=edge_x,
         y=edge_y,
-        line=dict(width=0.5, color="#888"),
+        line={"width": 0.5, "color": '#888'},
         hoverinfo="none",
         mode="lines",
     )
@@ -498,7 +506,7 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
         y=node_y,
         mode="markers",
         hoverinfo="text",
-        marker=dict(showscale=True, colorscale="YlGnBu", size=10),
+        marker={"showscale": True, "colorscale": 'YlGnBu', "size": 10},
         text=node_labels,  # Display node labels on hover
     )
 
@@ -509,9 +517,9 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     fig.update_layout(
         showlegend=True,
         hovermode="closest",
-        margin=dict(b=0, l=0, r=0, t=0),
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        margin={"b": 0, "l": 0, "r": 0, "t": 0},
+        xaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
+        yaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
     )
 
     # Show the interactive plot
@@ -519,11 +527,11 @@ def visualizetree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Fi
     return fig
 
 
+def create_tree_from_edges(edges) -> Graph:
+    """"""
 
-def create_tree_from_edges(edges):
-    from igraph import Graph
-    from igraph import plot
-    import cairocffi
+    # from igraph import plot (NO need; igraph already imported at top)
+    # import cairocffi
     # Create an empty directed graph
     tree = Graph(directed=True)
     # Add vertices
@@ -536,9 +544,7 @@ def create_tree_from_edges(edges):
     return tree
 
 
-
-
-# ---MAIN---
+# --------------------------------------------------- MAIN ---------------------------------------------------------- #
 if __name__ == '__main__':
     game_file_2021 = open('tree_data/testy_test.txt')
     game_file_2022 = open('tree_data/testy_test.txt')
@@ -574,3 +580,15 @@ if __name__ == '__main__':
     # print("This map is " + vct_tree.best_side_for_map(current_map))
     # print(eco_tree.best_buy_for_map(current_map))
     visualizetree(game_data_2021[1], game_data_2022[1], game_data_2023[1])
+
+    import doctest
+
+    doctest.testmod()
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
+        'allowed-io': [],
+        'max-nested-blocks': 5
+    })
