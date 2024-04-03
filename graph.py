@@ -17,7 +17,7 @@ class _WeightedVertex:
     neighbours: dict[_WeightedVertex, float]
     role: str
 
-    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], type: str, role: str = None) -> None:
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], vertex_type: str, role: str = None) -> None:
         """Initialize a new vertex with the given item and type and neighbours.
 
         Preconditions:
@@ -25,7 +25,7 @@ class _WeightedVertex:
         """
         self.item = item
         self.neighbours = neighbours
-        self.type = type
+        self.type = vertex_type
         self.role = role
 
     def degree(self) -> int:
@@ -48,7 +48,7 @@ class WeightedGraph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, type: str, role: str = None) -> None:
+    def add_vertex(self, item: Any, vertex_type: str, role: str = None) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -56,7 +56,7 @@ class WeightedGraph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _WeightedVertex(item, {}, type, role)
+        self._vertices[item] = _WeightedVertex(item, {}, vertex_type, role)
 
     def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -276,7 +276,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
 
     Precondition:
         - map_ref is in the format {map_name: agent_ref}
-        where agent_ref is in the format {agent_name: [sum_pick_rate, total_wins, total_played]}
+        where agent_ref is in the format {agent_name: [sum_pick_rate, count_pick_rate, total_wins, total_played, role]}
         - role is in {'duelists', 'controllers', 'initiators', 'sentinels', None}
         - cu_map in {'ascent', 'pearl', 'split', 'lotus', 'icebox', 'fracture', 'bind', 'haven', 'all'}
     """
@@ -288,11 +288,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
                 if (role is None) or (map_ref[map_name][agent_name][4] == role):
                     if not g.check_exists(agent_name):
                         g.add_vertex(agent_name, 'agent', map_ref[map_name][agent_name][4])
-                    if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
-                        weight = 0
-                    else:
-                        weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3])
-                                  + 5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+                    weight = calc_map_agent_weight(map_ref[map_name][agent_name])
                     g.add_edge(map_name, agent_name, round(weight, 2))
     else:
         g.add_vertex(cu_map, 'map')
@@ -300,11 +296,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
             if (role is None) or (map_ref[cu_map][agent_name][4] == role):
                 if not g.check_exists(agent_name):
                     g.add_vertex(agent_name, 'agent', map_ref[cu_map][agent_name][4])
-                if map_ref[cu_map][agent_name][3] == 0 or map_ref[cu_map][agent_name][1] == 0:
-                    weight = 0
-                else:
-                    weight = (10 * (map_ref[cu_map][agent_name][2] / map_ref[cu_map][agent_name][3])
-                              + 5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
+                weight = calc_map_agent_weight(map_ref[cu_map][agent_name])
                 g.add_edge(cu_map, agent_name, round(weight, 2))
 
     if view_agent_weights:
@@ -314,7 +306,23 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
     return g
 
 
-def add_agent_combo(agent_combination: set, g: WeightedGraph):
+def calc_map_agent_weight(data: list) -> float:
+    """
+    Return the weight for the map-agent edge based on data and the formula given and explained in the docstring of
+    generate_weighted_graph() function
+
+    Preconditions:
+        - data is in the format [sum_pick_rate, count_pick_rate, total_wins, total_played, role]
+    """
+    if data[3] == 0 or data[1] == 0:
+        weight = 0
+    else:
+        weight = (10 * (data[2] / data[3])
+                  + 5 * (data[0] / data[1]))
+    return weight
+
+
+def add_agent_combo(agent_combination: set, g: WeightedGraph) -> None:
     """
     Update the weights of all agent pairs in agent_combination to the graph g.
     If any agent pair doesn't exist in g, add it to g.
@@ -332,7 +340,7 @@ def add_agent_combo(agent_combination: set, g: WeightedGraph):
     """
     agent_combs = list(agent_combination)
     for i in range(len(agent_combs)):
-        for j in range(1, len(agent_combs)):
+        for j in range(i, len(agent_combs)):
             v1, v2 = g.get_vertex(agent_combs[i]), g.get_vertex(agent_combs[j])
             if v1 and v2:
                 if not g.adjacent(agent_combs[i], agent_combs[j]):
@@ -470,32 +478,21 @@ def visualize_agent_graph(agents_roles: dict, map_ref: dict, agent_combos: list,
     """
     Visualize a graph of agents of type role only and maps.
     If role is an empty string, then visualize graphs for all roles
-    :param agents_roles:
-    :param map_ref:
-    :param role:
-    :return:
     """
     from visualization import visualize_weighted_graph
     if role:
         g = generate_weighted_graph(map_ref, agent_combos, role)
         visualize_weighted_graph(g)
     else:
-        for role in set(agents_roles.values()):
-            g = generate_weighted_graph(map_ref, agent_combos, role)
+        for agent_role in set(agents_roles.values()):
+            g = generate_weighted_graph(map_ref, agent_combos, agent_role)
             visualize_weighted_graph(g)
 
 
 def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str,
                  view_agent_weights: bool = False) -> Figure:
     """
-
-    :param view_agent_weights:
-    :param agent_comb:
-    :param cur_map:
-    :param agents_roles:
-    :param map_ref:
-    :param role:
-    :return:
+    Return a weighted graph from the following data as a Figure class object
     """
     from visualization import return_weighted_graph
     if not view_agent_weights:
@@ -550,7 +547,8 @@ if __name__ == '__main__':
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['E1136', 'W0221'],
-        'extra-imports': ['csv', 'networkx', 'Figure', 'visualize_weighted_graph', 'return_weighted_graph'],
-        'allowed-io': ['generate_weighted_graph'],
-        'max-nested-blocks': 4
+        'extra-imports': ['csv', 'networkx', 'plotly.graph_objs', 'visualization'],
+        'allowed-io': ['clean_agents_pick_file', 'clean_teams_picked_agents_file', 'clean_all_agents_file',
+                       'load_agent_role_data', 'load_agent_combo_data', 'load_map_agent_data'],
+        'max-nested-blocks': 5
     })
