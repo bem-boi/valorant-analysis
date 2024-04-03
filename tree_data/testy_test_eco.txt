@@ -1,0 +1,35 @@
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,2,Vision Strikers,14.4k,5.2k,Semi-buy: 10-20k,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,2,FULL SENSE,2.4k,8.4k,Eco: 0-5k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,3,Vision Strikers,17.6k,15.2k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,3,FULL SENSE,19.9k,0.9k,Semi-buy: 10-20k,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,4,Vision Strikers,22.6k,4.7k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,4,FULL SENSE,21.7k,9.0k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,5,Vision Strikers,22.0k,4.2k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,5,FULL SENSE,10.0k,10.2k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,6,Vision Strikers,23.0k,17.1k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,6,FULL SENSE,21.9k,2.0k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,7,Vision Strikers,22.6k,5.5k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,7,FULL SENSE,21.3k,7.4k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,8,Vision Strikers,22.0k,4.9k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,8,FULL SENSE,8.1k,10.3k,Semi-eco: 5-10k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,9,Vision Strikers,23.1k,11.2k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,9,FULL SENSE,21.6k,1.4k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,10,Vision Strikers,22.6k,16.9k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,10,FULL SENSE,14.3k,6.8k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,11,Vision Strikers,22.6k,23.4k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,11,FULL SENSE,22.1k,0.7k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,12,Vision Strikers,22.9k,12.1k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,12,FULL SENSE,21.9k,3.8k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,13,Vision Strikers,3.7k,0.4k,Eco: 0-5k,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,13,FULL SENSE,3.9k,0.4k,Eco: 0-5k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,14,Vision Strikers,14.0k,4.2k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,14,FULL SENSE,2.7k,8.2k,Eco: 0-5k,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,15,Vision Strikers,4.3k,11.2k,Eco: 0-5k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,15,FULL SENSE,21.4k,5.8k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,16,Vision Strikers,21.6k,2.7k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,16,FULL SENSE,23.7k,9.7k,Full buy: 20k+,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,17,Vision Strikers,21.0k,4.0k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,17,FULL SENSE,18.7k,3.4k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,18,Vision Strikers,20.7k,3.9k,Full buy: 20k+,Win
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Haven,18,FULL SENSE,17.5k,0.7k,Semi-buy: 10-20k,Loss
+Valorant Champions 2021,Group Stage,Opening (D),Vision Strikers vs FULL SENSE,Breeze,1,Vision Strikers,3.6k,0.5k,Eco: 0-5k,Win
