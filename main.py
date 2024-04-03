@@ -198,4 +198,4 @@ def update_output(choice2, button, input):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8052)
+    app.run(debug=False, port=8052)
