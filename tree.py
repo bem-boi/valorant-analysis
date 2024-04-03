@@ -364,8 +364,8 @@ def generate_tree(year: str, data: list[dict]) -> Tree:
     :param data:
     :return:
     """
-    t = Tree('VCT ' + year, [])
-    for game in data:
+    t = Tree(f"VCT {year}", [])
+    for game in data[1]:
         keys = list(game.keys())
         match = keys[0]
         for m_map in game[match]:
