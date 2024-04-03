@@ -13,19 +13,19 @@ from plotly.graph_objs import Figure
 
 class _WeightedVertex:
     item: Any
-    sort: str
+    type: str
     neighbours: dict[_WeightedVertex, float]
     role: str
 
-    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], sort: str, role: str = None) -> None:
-        """Initialize a new vertex with the given item and sort and neighbours.
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], type: str, role: str = None) -> None:
+        """Initialize a new vertex with the given item and type and neighbours.
 
         Preconditions:
-            - sort in {'map', 'agent'}
+            - type in {'map', 'agent'}
         """
         self.item = item
         self.neighbours = neighbours
-        self.sort = sort
+        self.type = type
         self.role = role
 
     def degree(self) -> int:
@@ -48,7 +48,7 @@ class WeightedGraph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, sort: str, role: str = None) -> None:
+    def add_vertex(self, item: Any, type: str, role: str = None) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -56,7 +56,7 @@ class WeightedGraph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _WeightedVertex(item, {}, sort, role)
+        self._vertices[item] = _WeightedVertex(item, {}, type, role)
 
     def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -148,7 +148,7 @@ class WeightedGraph:
         >>> g.get_vertex('reyna') is None
         True
         >>> v = g.get_vertex('jett')
-        >>> v.item == 'jett' and v.sort == 'agent' and v.role == 'duelists' and v.neighbours == {}
+        >>> v.item == 'jett' and v.type == 'agent' and v.role == 'duelists' and v.neighbours == {}
         True
         """
         if item in self._vertices:
@@ -164,11 +164,11 @@ class WeightedGraph:
         """
         graph_nx = nx.Graph()
         for v in self._vertices.values():
-            graph_nx.add_node(v.item, sort=v.sort)
+            graph_nx.add_node(v.item, type=v.type)
 
             for u in v.neighbours.keys():
                 if graph_nx.number_of_nodes() < max_vertices:
-                    graph_nx.add_node(u.item, sort=u.sort)
+                    graph_nx.add_node(u.item, type=u.type)
 
                 if u.item in graph_nx.nodes:
                     graph_nx.add_edge(v.item, u.item, weight=v.neighbours[u])
@@ -182,7 +182,7 @@ class WeightedGraph:
 # -------------------------------------------- DATA LOADING FUNCTIONS ----------------------------------------------- #
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
-    Return a dictionary where the keys are the agent names and the values are the sort of role (e.g. duelists)
+    Return a dictionary where the keys are the agent names and the values are the type of role (e.g. duelists)
     from the file being referred to by agent_role
 
     Preconditions:
@@ -447,7 +447,7 @@ def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
     """
     list_of_compatible = {}
     for u in graph.get_neighbours(agent):
-        if u not in list_of_compatible and u != agent and graph.get_vertex(u).sort == 'agent':
+        if u not in list_of_compatible and u != agent and graph.get_vertex(u).type == 'agent':
             list_of_compatible[u] = graph.get_weight(u, agent)
 
     sorted_compatible = dict(sorted(list_of_compatible.items(), key=lambda item: item[1], reverse=True))
@@ -529,7 +529,7 @@ if __name__ == '__main__':
 
     # current_map = input("What map are you playing?").lower()
     # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
-    # # enter would make it '' sort
+    # # enter would make it '' type
     # teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
     #                      "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
     # teammate_data = []
