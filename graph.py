@@ -1,3 +1,9 @@
+"""
+This python module contains classes and functions to represent and generate
+weighted graphs of Valorant map and agent data
+
+This file is Copyright (c) 2024 of Project Team
+"""
 from __future__ import annotations
 from typing import Any, Union
 import csv
@@ -7,19 +13,19 @@ from plotly.graph_objs import Figure
 
 class _WeightedVertex:
     item: Any
-    type: str
+    sort: str
     neighbours: dict[_WeightedVertex, float]
     role: str
 
-    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], type: str, role: str = None) -> None:
-        """Initialize a new vertex with the given item and type and neighbours.
+    def __init__(self, item: Any, neighbours: dict[_WeightedVertex, float], sort: str, role: str = None) -> None:
+        """Initialize a new vertex with the given item and sort and neighbours.
 
         Preconditions:
-            - type in {'map', 'agent'}
+            - sort in {'map', 'agent'}
         """
         self.item = item
         self.neighbours = neighbours
-        self.type = type
+        self.sort = sort
         self.role = role
 
     def degree(self) -> int:
@@ -42,7 +48,7 @@ class WeightedGraph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, type: str, role: str = None) -> None:
+    def add_vertex(self, item: Any, sort: str, role: str = None) -> None:
         """Add a vertex with the given item to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -50,7 +56,7 @@ class WeightedGraph:
         Preconditions:
             - item not in self._vertices
         """
-        self._vertices[item] = _WeightedVertex(item, {}, type, role)
+        self._vertices[item] = _WeightedVertex(item, {}, sort, role)
 
     def add_edge(self, item1: Any, item2: Any, weight: float) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -142,7 +148,7 @@ class WeightedGraph:
         >>> g.get_vertex('reyna') is None
         True
         >>> v = g.get_vertex('jett')
-        >>> v.item == 'jett' and v.type == 'agent' and v.role == 'duelists' and v.neighbours == {}
+        >>> v.item == 'jett' and v.sort == 'agent' and v.role == 'duelists' and v.neighbours == {}
         True
         """
         if item in self._vertices:
@@ -158,11 +164,11 @@ class WeightedGraph:
         """
         graph_nx = nx.Graph()
         for v in self._vertices.values():
-            graph_nx.add_node(v.item, type=v.type)
+            graph_nx.add_node(v.item, sort=v.sort)
 
             for u in v.neighbours.keys():
                 if graph_nx.number_of_nodes() < max_vertices:
-                    graph_nx.add_node(u.item, type=u.type)
+                    graph_nx.add_node(u.item, sort=u.sort)
 
                 if u.item in graph_nx.nodes:
                     graph_nx.add_edge(v.item, u.item, weight=v.neighbours[u])
@@ -176,7 +182,7 @@ class WeightedGraph:
 # -------------------------------------------- DATA LOADING FUNCTIONS ----------------------------------------------- #
 def load_agent_role_data(agent_role: str) -> dict[str: str]:
     """
-    Return a dictionary where the keys are the agent names and the values are the type of role (e.g. duelists)
+    Return a dictionary where the keys are the agent names and the values are the sort of role (e.g. duelists)
     from the file being referred to by agent_role
 
     Preconditions:
@@ -285,8 +291,8 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
                     if map_ref[map_name][agent_name][3] == 0 or map_ref[map_name][agent_name][1] == 0:
                         weight = 0
                     else:
-                        weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3]) +
-                                  5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
+                        weight = (10 * (map_ref[map_name][agent_name][2] / map_ref[map_name][agent_name][3])
+                                  + 5 * (map_ref[map_name][agent_name][0] / map_ref[map_name][agent_name][1]))
                     g.add_edge(map_name, agent_name, round(weight, 2))
     else:
         g.add_vertex(cu_map, 'map')
@@ -297,8 +303,8 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
                 if map_ref[cu_map][agent_name][3] == 0 or map_ref[cu_map][agent_name][1] == 0:
                     weight = 0
                 else:
-                    weight = (10 * (map_ref[cu_map][agent_name][2] / map_ref[cu_map][agent_name][3]) +
-                              5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
+                    weight = (10 * (map_ref[cu_map][agent_name][2] / map_ref[cu_map][agent_name][3])
+                              + 5 * (map_ref[cu_map][agent_name][0] / map_ref[cu_map][agent_name][1]))
                 g.add_edge(cu_map, agent_name, round(weight, 2))
 
     if view_agent_weights:
@@ -441,7 +447,7 @@ def compatible_agents(graph: WeightedGraph, agent: str) -> dict[str: float]:
     """
     list_of_compatible = {}
     for u in graph.get_neighbours(agent):
-        if u not in list_of_compatible and u != agent and graph.get_vertex(u).type == 'agent':
+        if u not in list_of_compatible and u != agent and graph.get_vertex(u).sort == 'agent':
             list_of_compatible[u] = graph.get_weight(u, agent)
 
     sorted_compatible = dict(sorted(list_of_compatible.items(), key=lambda item: item[1], reverse=True))
@@ -523,7 +529,7 @@ if __name__ == '__main__':
 
     # current_map = input("What map are you playing?").lower()
     # favored_role = input("What role do you want to play? Press ENTER if you have no preference").lower()  # pressing
-    # # enter would make it '' type
+    # # enter would make it '' sort
     # teammate_ask = input("Do you want the recommendation to be based on what agents your teammates are playing? Type "
     #                      "'NO' if you don't want it to be considered. Otherwise type 'YES'. ").upper()
     # teammate_data = []
@@ -536,3 +542,15 @@ if __name__ == '__main__':
     # print(agents_to_play)
 
     # visualize_graph(agent_role_data, map_agent_data, '')
+
+    import doctest
+    doctest.testmod()
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['E1136', 'W0221'],
+        'extra-imports': ['csv', 'networkx', 'Figure', 'visualize_weighted_graph', 'return_weighted_graph'],
+        'allowed-io': ['generate_weighted_graph'],
+        'max-nested-blocks': 4
+    })

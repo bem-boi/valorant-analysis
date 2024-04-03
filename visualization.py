@@ -47,9 +47,9 @@ def setup_weighted_graph(graph: graph_file.WeightedGraph, layout: str = 'spring_
     labels = list(graph_nx.nodes)
     weights = nx.get_edge_attributes(graph_nx, 'weight')
 
-    types = [graph_nx.nodes[k]['type'] for k in graph_nx.nodes]
+    sorts = [graph_nx.nodes[k]['sort'] for k in graph_nx.nodes]
 
-    colours = [MAP_COLOUR if type == 'map' else AGENT_COLOUR for type in types]
+    colours = [MAP_COLOUR if sort == 'map' else AGENT_COLOUR for sort in sorts]
 
     x_edges = []
     y_edges = []
