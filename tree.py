@@ -164,6 +164,10 @@ class Tree:
         else:
             return "favours both sides"
 
+    def _best_buy_helper(self) -> str:
+        for subtree in self._subtrees:
+            return subtree._root[1]
+
     def best_buy_for_map(self, map_played: str) -> str:
         """
         Returns a string stating which buy type is more likely to win based on the given map (map_played).
@@ -183,15 +187,15 @@ class Tree:
                 for subtree3 in subtree2._subtrees:
                     if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
-                            for subtree5 in subtree4._subtrees:
-                                if subtree5._root[1] == 'Eco: 0-5k':
-                                    eco += 1
-                                elif subtree5._root[1] == 'Semi-eco: 5-10k':
-                                    semi_eco += 1
-                                elif subtree5._root[1] == 'Semi-buy: 10-20k':
-                                    semi_buy += 1
-                                else:
-                                    full += 1
+                            buy = subtree4._best_buy_helper()
+                            if buy == 'Eco: 0-5k':
+                                eco += 1
+                            elif buy == 'Semi-eco: 5-10k':
+                                semi_eco += 1
+                            elif buy == 'Semi-buy: 10-20k':
+                                semi_buy += 1
+                            else:
+                                full += 1
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
             return 'Eco buy is most effective'
