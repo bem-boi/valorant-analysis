@@ -210,8 +210,8 @@ class Tree:
         defend = 0
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root.lower() == map_played:
-                    for subtree3 in subtree2._subtrees:
+                for subtree3 in subtree2._subtrees:
+                    if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
                             for subtree5 in subtree4._subtrees:
                                 attack += subtree5._root[0]
@@ -235,8 +235,8 @@ class Tree:
         full = 0
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root.lower() == map_played:
-                    for subtree3 in subtree2._subtrees:
+                for subtree3 in subtree2._subtrees:
+                    if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
                             for subtree5 in subtree4._subtrees:
                                 if subtree5._root[1] == 'Eco: 0-5k':
@@ -377,13 +377,13 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 
 # ---MAIN---
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/maps_scores_21.csv')
-    game_file_2022 = open('tree_data/maps_scores_22.csv')
+    game_file_2021 = open('tree_data/maps_scores_2021.csv')
+    game_file_2022 = open('tree_data/maps_scores_2022.csv')
     game_file_2023 = open('tree_data/maps_scores_2023.csv')
 
-    eco_file_2021 = open('tree_data/new_eco_data_2021.csv')
-    eco_file_2022 = open('tree_data/new_eco_data_2022.csv')
-    eco_file_2023 = open('tree_data/new_eco_data_2023.csv')
+    eco_file_2021 = open('tree_data/eco_data_2021.csv')
+    eco_file_2022 = open('tree_data/eco_data_2022.csv')
+    eco_file_2023 = open('tree_data/eco_data_2023.csv')
 
     game_data_2021 = read_game(game_file_2021)
     game_data_2022 = read_game(game_file_2022)
