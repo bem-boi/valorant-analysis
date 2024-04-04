@@ -165,7 +165,7 @@ class Tree:
         else:
             return "favours both sides"
 
-    def _best_buy_helper(self, eco: int, semi_eco: int, semi_buy: int, full: int) -> str:
+    def _best_buy_helper(self, eco: int, semi_eco: int, semi_buy: int, full: int) -> None:
         for subtree in self._subtrees:
             if subtree._root[1] == 'Eco: 0-5k':
                 eco += 1
