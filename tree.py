@@ -327,6 +327,9 @@ def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict])
     Returns a tree in the Figure class object from the following data of attack/defender scores given as lists of
     dictionary. data1 represents the data from 2021, data2 represents the data from 2022, and data3 represents the data
     from 2023.
+
+    Parts of the code is taken from: https://stackoverflow.com/questions/77214598/how-do-i-flip-my-igraph-
+    tree-in-python-so-that-it-isnt-upside-down
     """
     i_d = 0
     g = Graph(directed=True)
@@ -435,6 +438,9 @@ def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) 
     Returns a tree in the Figure class object from the following data of buy types given as lists of
     dictionary. data1 represents the data from 2021, data2 represents the data from 2022, and data3 represents the data
     from 2023.
+
+    Parts of the code is taken from: https://stackoverflow.com/questions/77214598/how-do-i-flip-my-igraph-tree-
+    in-python-so-that-it-isnt-upside-down
     """
     i_d = 0
     g = Graph(directed=True)
