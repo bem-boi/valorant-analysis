@@ -143,8 +143,7 @@ class Tree:
                 subtree._insert_helper(items[1:])
 
     def _best_side_helper(self) -> tuple[int, int]:
-        for subtree in self._subtrees:
-            return (subtree._root[0], subtree._root[1])
+        return (self._subtrees[0]._root[0], self._subtrees[0]._root[1])
 
     def best_side_for_map(self, map_played: str) -> str:
         """
@@ -158,7 +157,7 @@ class Tree:
                 for subtree3 in subtree2._subtrees:
                     if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
-                            attack, defend = subtree4.best_side_for_map()
+                            attack, defend = subtree4._best_side_helper()
         if attack > defend:
             return "is Attacker sided"
         if attack < defend:
