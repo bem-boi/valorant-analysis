@@ -3,9 +3,6 @@ trees r slay
 """
 from __future__ import annotations
 from typing import Any, Optional, TextIO
-from igraph import Graph
-import plotly.graph_objects as go
-from plotly.graph_objs import Figure
 
 
 class Tree:
@@ -35,14 +32,6 @@ class Tree:
         """
         self._root = root
         self._subtrees = subtrees
-
-    def get_root(self) -> Optional[Any]:
-        """Returns the root of this tree"""
-        return self._root
-
-    def get_subtrees(self) -> Optional[Any]:
-        """Returns the subtrees of this tree"""
-        return self._subtrees
 
     def is_empty(self) -> bool:
         """Return whether this tree is empty.
@@ -118,29 +107,6 @@ class Tree:
         Tree(2, [Tree(4, []), Tree(5, [])])
         """
         return f"Tree({self._root}, {self._subtrees})"
-
-    def height(self: Tree) -> int:
-        """Return the height of this tree.
-
-        Please refer to the prep readings for the definition of tree height.
-
-        >>> t1 = Tree(17, [])
-        >>> t1.height()
-        1
-        >>> t2 = Tree(1, [Tree(4, [Tree(5, [])]), Tree(1, [Tree(5, [Tree(5, [])])])])
-        >>> t2.height()
-        4
-        """
-        if self.is_empty():
-            return 0
-        elif not self._subtrees:
-            return 1
-        else:
-            max_height = 0
-            for subtree in self._subtrees:
-                if subtree.height() > max_height:
-                    max_height = subtree.height()
-            return 1 + max_height
 
     def insert_sequence(self, items: list) -> None:
         """Insert the given items into this tree.
@@ -244,35 +210,43 @@ class Tree:
         defend = 0
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root.lower() == map_played:
-                    for subtree3 in subtree2._subtrees:
+                for subtree3 in subtree2._subtrees:
+                    if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
                             for subtree5 in subtree4._subtrees:
                                 attack += subtree5._root[0]
                                 defend += subtree5._root[1]
         if attack > defend:
-            return "Attacker sided"
+            return "is Attacker sided"
         if attack < defend:
-            return "Defender sided"
+            return "is Defender sided"
         else:
-            return "Map favours both sides"
+            return "favours both sides"
 
     def best_buy_for_map(self, map_played: str) -> str:
         """
-        Returns a message stating the type of buy that is best for map_played
+        TODO: docstring
+        :param map_played:
+        :return:
         """
         eco = 0
         semi_eco = 0
         semi_buy = 0
         full = 0
-        buy_counts = [0, 0, 0, 0]
         for subtree1 in self._subtrees:
             for subtree2 in subtree1._subtrees:
-                if subtree2._root.lower() == map_played:
-                    for subtree3 in subtree2._subtrees:
+                for subtree3 in subtree2._subtrees:
+                    if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
-                            subtree4.update_buy_counts(buy_counts, subtree4)
-
+                            for subtree5 in subtree4._subtrees:
+                                if subtree5._root[1] == 'Eco: 0-5k':
+                                    eco += 1
+                                elif subtree5._root[1] == 'Semi-eco: 5-10k':
+                                    semi_eco += 1
+                                elif subtree5._root[1] == 'Semi-buy: 10-20k':
+                                    semi_buy += 1
+                                else:
+                                    full += 1
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
             return 'Eco buy is most effective'
@@ -291,20 +265,6 @@ class Tree:
         """
         for tree in trees:
             self._subtrees.append(tree)
-
-    def update_buy_counts(self, buy_counts: list, subtree: Tree) -> None:
-        """
-        Update the counts of each buy type based on subtree
-        """
-        for subtree5 in subtree._subtrees:
-            if subtree5._root[1] == 'Eco: 0-5k':
-                buy_counts[0] += 1
-            elif subtree5._root[1] == 'Semi-eco: 5-10k':
-                buy_counts[1] += 1
-            elif subtree5._root[1] == 'Semi-buy: 10-20k':
-                buy_counts[2] += 1
-            else:
-                buy_counts[3] += 1
 
 
 def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
@@ -340,7 +300,7 @@ def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
 
         game[match_name] = matches
         info.append(game)
-    return year, info
+    return (year, info)
 
 
 def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
@@ -395,7 +355,7 @@ def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
 
         game[match_name] = matches
         info.append(game)
-    return year, info
+    return (year, info)
 
 
 def generate_tree(data: tuple[str, list[dict]]) -> Tree:
@@ -415,277 +375,38 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
     return t
 
 
-def data_at_height(t: Tree, i: int) -> list:
-    """
-    Returns a list of the values of the nodes at depth i of the tree t
-    (the root node is considered to have a depth of 0)
-
-    Preconditions:
-        - i >= 0
-
-    >>> t1 = Tree(1, [Tree(4, [Tree(5, [])]), Tree(1, [Tree(5, [Tree(5, [])])])])
-    >>> data_at_height(t1, 0)
-    [1]
-    >>> data_at_height(t1, 2)
-    [5, 5]
-    >>> t2 = Tree(1, [Tree(2, [Tree(4, []),Tree(5, [])]),Tree(3, [Tree(6, []),Tree(7, [])])])
-    >>> data_at_height(t2, 2)
-    [4, 5, 6, 7]
-    """
-    if i == 0:
-        return [t.get_root()] if t.get_root() is not None else []
-    else:
-        nodes = []
-        for subtree in t.get_subtrees():
-            nodes.extend(data_at_height(subtree, i - 1))
-        return nodes
-
-
-def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
-    """
-    Returns a tree from the following data given as a Figure class object
-    """
-    i_d = 0
-    g = Graph(directed=True)
-    g.add_vertex('VCT')
-
-    id_1 = visual_tree_game_helper(g, i_d, data1, '2021')
-    id_2 = visual_tree_game_helper(g, id_1, data2, '2022')
-    visual_tree_game_helper(g, id_2, data3, '2023')
-
-    layt = g.layout("kk")
-
-    edge_x, edge_y = [], []
-    for edge in g.get_edgelist():
-        x0, y0 = layt[edge[0]]
-        x1, y1 = layt[edge[1]]
-        edge_x.extend([x0, x1, None])
-        edge_y.extend([y0, y1, None])
-
-    # Get vertex coordinates and labels
-    node_x, node_y = zip(*[layt[vertex] for vertex in g.vs.indices])
-    # node_labels = [str(label) for label in g.vs.indices]
-    node_labels = g.vs['name']
-
-    # Create Plotly trace for edges
-    edge_trace = go.Scatter(
-        x=edge_x,
-        y=edge_y,
-        line={"width": 0.5, "color": '#888'},
-        hoverinfo="none",
-        mode="lines",
-    )
-
-    # Create Plotly trace for nodes
-    node_trace = go.Scatter(
-        x=node_x,
-        y=node_y,
-        mode="markers",
-        hoverinfo="text",
-        marker={"showscale": True, "colorscale": 'YlGnBu', "size": 10},
-        text=node_labels,  # Display node labels on hover
-    )
-
-    # Create a figure and add traces
-    fig = go.Figure(data=[edge_trace, node_trace])
-
-    # Customize layout
-    fig.update_layout(
-        showlegend=True,
-        hovermode="closest",
-        margin={"b": 0, "l": 0, "r": 0, "t": 0},
-        xaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
-        yaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
-    )
-
-    # Show the interactive plot
-    return fig
-
-
-def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
-    g.add_vertex('VCT ' + year)
-    g.add_edge('VCT', 'VCT ' + year)
-    for game in data:
-        name_of_match = list(game.keys())[0]
-        maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(cur_id))
-        g.add_edge(name_of_match + ' id: ' + str(cur_id), 'VCT ' + year)
-        name_of_match_id = cur_id
-        for m in maps:
-            team_name = list(game[name_of_match][m])
-            team1 = team_name[0]
-            team2 = team_name[1]
-            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
-                                        list(game[name_of_match][m].values())[0][1])
-            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
-                                        list(game[name_of_match][m].values())[1][1])
-            cur_id += 1
-            team1_id = cur_id
-            g.add_vertex(team1 + ' id: ' + str(cur_id))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(cur_id))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(cur_id))
-            g.add_edge(team1 + ' id: ' + str(cur_id), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(cur_id))
-            g.add_edge(team1 + ' id: ' + str(cur_id), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(cur_id))
-            cur_id += 1
-            team2_id = cur_id
-            g.add_vertex(team2 + ' id: ' + str(cur_id))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(cur_id))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(cur_id))
-            g.add_edge(team2 + ' id: ' + str(cur_id), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(cur_id))
-            g.add_edge(team2 + ' id: ' + str(cur_id), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(cur_id))
-            cur_id += 1
-            g.add_vertex(m + ' id: ' + str(cur_id))
-            g.add_edge(m + ' id: ' + str(cur_id), team1 + ' id: ' + str(team1_id))
-            g.add_edge(m + ' id: ' + str(cur_id), team2 + ' id: ' + str(team2_id))
-            g.add_edge(m + ' id: ' + str(cur_id), name_of_match + ' id: ' + str(name_of_match_id))
-        cur_id += 1
-    return cur_id + 1
-
-
-def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
-    """
-
-    :param data1:
-    :param data2:
-    :param data3:
-    :return:
-    """
-    i_d = 0
-    g = Graph(directed=True)
-    g.add_vertex('VCT')
-
-    id_1 = visual_tree_econ_helper(g, i_d, data1, '2021')
-    id_2 = visual_tree_econ_helper(g, id_1, data2, '2022')
-    visual_tree_econ_helper(g, id_2, data3, '2023')
-
-    layt = g.layout("kk")
-
-    edge_x, edge_y = [], []
-    for edge in g.get_edgelist():
-        x0, y0 = layt[edge[0]]
-        x1, y1 = layt[edge[1]]
-        edge_x.extend([x0, x1, None])
-        edge_y.extend([y0, y1, None])
-
-    # Get vertex coordinates and labels
-    node_x, node_y = zip(*[layt[vertex] for vertex in g.vs.indices])
-    # node_labels = [str(label) for label in g.vs.indices]
-    node_labels = g.vs['name']
-
-    # Create Plotly trace for edges
-    edge_trace = go.Scatter(
-        x=edge_x,
-        y=edge_y,
-        line={"width": 0.5, "color": '#888'},
-        hoverinfo="none",
-        mode="lines",
-    )
-
-    # Create Plotly trace for nodes
-    node_trace = go.Scatter(
-        x=node_x,
-        y=node_y,
-        mode="markers",
-        hoverinfo="text",
-        marker={"showscale": True, "colorscale": 'YlGnBu', "size": 10},
-        text=node_labels,  # Display node labels on hover
-    )
-
-    # Create a figure and add traces
-    fig = go.Figure(data=[edge_trace, node_trace])
-
-    # Customize layout
-    fig.update_layout(
-        showlegend=True,
-        hovermode="closest",
-        margin={"b": 0, "l": 0, "r": 0, "t": 0},
-        xaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
-        yaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
-    )
-
-    # Show the interactive plot
-    return fig
-
-
-def visual_tree_econ_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
-    g.add_vertex('VCT ' + year)
-    g.add_edge('VCT', 'VCT ' + year)
-    for game in data:
-        name_of_match = list(game.keys())[0]
-        maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(cur_id))
-        g.add_edge(name_of_match + ' id: ' + str(cur_id), 'VCT ' + year)
-        name_of_match_id = cur_id
-        for m in maps:
-            cur_id += 1
-            map_id = cur_id
-            g.add_vertex(m + ' id: ' + str(map_id))
-            for matches in game[name_of_match][m].values():
-                cur_id += 1
-                g.add_vertex(matches[0] + ' won by ' + matches[1] + ' id: ' + str(cur_id))
-                g.add_edge(matches[0] + ' won by ' + matches[1] + ' id: ' + str(cur_id), m + ' id: ' + str(map_id))
-            g.add_edge(m + ' id: ' + str(map_id), name_of_match + ' id: ' + str(name_of_match_id))
-        cur_id += 1
-    return cur_id + 1
-
-
-def create_tree_from_edges(edges: Any) -> Graph:
-    """
-    Returns a tree made from the edges given as an igraph Graph object
-    """
-
-    # from igraph import plot (NO need; igraph already imported at top)
-    # import cairocffi
-    # Create an empty directed graph
-    tree = Graph(directed=True)
-    # Add vertices
-    vertices = set()
-    for edge in edges:
-        vertices.update(edge)
-    tree.add_vertices(list(vertices))
-    # Add edges to the graph
-    tree.add_edges(edges)
-    return tree
-
-
-# --------------------------------------------------- MAIN ---------------------------------------------------------- #
+# ---MAIN---
 if __name__ == '__main__':
-    game_datas = []
-    eco_datas = []
-    game_trees, eco_trees = [], []
-    for x in range(1, 4):
-        with open('tree_data/testy_test.txt') as game_file:
-            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/maps_scores_202' + str(x) + '.csv'
-            game_dat = read_game(game_file)
+    game_file_2021 = open('tree_data/maps_scores_2021.csv')
+    game_file_2022 = open('tree_data/maps_scores_2022.csv')
+    game_file_2023 = open('tree_data/maps_scores_2023.csv')
 
-        with open('tree_data/testy_test_eco.txt') as eco_file:
-            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/eco_rounds_202' + str(x) + '.csv'
-            eco_dat = read_buy_type(eco_file)
+    eco_file_2021 = open('tree_data/eco_data_2021.csv')
+    eco_file_2022 = open('tree_data/eco_data_2022.csv')
+    eco_file_2023 = open('tree_data/eco_data_2023.csv')
 
-        game_datas.append(game_dat)
-        eco_datas.append(eco_dat)
-        game_trees.append(generate_tree(game_dat))
-        eco_trees.append(generate_tree(eco_dat))
+    game_data_2021 = read_game(game_file_2021)
+    game_data_2022 = read_game(game_file_2022)
+    game_data_2023 = read_game(game_file_2023)
+
+    eco_data_2021 = read_buy_type(eco_file_2021)
+    eco_data_2022 = read_buy_type(eco_file_2022)
+    eco_data_2023 = read_buy_type(eco_file_2023)
+
+    game_tree_2021 = generate_tree(game_data_2021)
+    game_tree_2022 = generate_tree(game_data_2022)
+    game_tree_2023 = generate_tree(game_data_2023)
+
+    eco_tree_2021 = generate_tree(eco_data_2021)
+    eco_tree_2022 = generate_tree(eco_data_2022)
+    eco_tree_2023 = generate_tree(eco_data_2023)
 
     vct_tree = Tree('VCT', [])
-    vct_tree.combine_all(game_trees)
+    vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
 
     eco_tree = Tree('VCT buy types', [])
-    eco_tree.combine_all(eco_trees)
+    eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
     current_map = input("What map are you playing?").lower()
-    print("This map is " + vct_tree.best_side_for_map(current_map))
+    print("This map " + vct_tree.best_side_for_map(current_map))
     print(eco_tree.best_buy_for_map(current_map))
-    visualize_tree_game(game_datas[0][1], game_datas[1][1], game_datas[2][1])
-    visualize_tree_eco(eco_datas[0][1], eco_datas[1][1], eco_datas[2][1])
-
-    # import doctest
-    # doctest.testmod()
-    # import python_ta
-    #
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
-    #     'allowed-io': [],
-    #     'max-nested-blocks': 5
-    # })
