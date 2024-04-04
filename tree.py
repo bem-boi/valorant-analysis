@@ -536,7 +536,7 @@ if __name__ == '__main__':
             with open('tree_data/maps_scores_202' + str(x) + '.csv') as game_file:
                 game_dat = read_game(game_file)
 
-            with open('tree_data/eco_rounds_202' + str(x) + '.csv') as eco_file:
+            with open('tree_data/eco_data_202' + str(x) + '.csv') as eco_file:
                 eco_dat = read_buy_type(eco_file)
 
             game_datas.append(game_dat)
