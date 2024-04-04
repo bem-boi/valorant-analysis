@@ -213,9 +213,11 @@ class Tree:
 
 def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
     """
-    TODO: docstring
-    :param game_data:
-    :return:
+    Returns a tuple consisting of the year a tournament took place and all the information needed to create a tree
+    representation of the data.
+    game_data is a csv file with the information of one year's Valorant tournament, specifically with the
+    attacker/defender scores of every winning team.
+    Each dictionary in the returned list (in the tuple) corresponds to the information of a game in the tournament.
     """
     info = []
     game_data.readline()
@@ -249,9 +251,11 @@ def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
 
 def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     """
-    TODO: docstring
-    :param eco_data:
-    :return:
+    Returns a tuple consisting of the year a tournament took place and all the information needed to create a tree
+    representation of the data.
+    eco_data is a csv file with the information of one year's Valorant tournament, specifically with the buy type of
+    each winning team.
+    Each dictionary in the returned list represents a game in the tournament and all of its buy type information.
     """
     info = []
     eco_data.readline()
@@ -304,9 +308,8 @@ def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
 
 def generate_tree(data: tuple[str, list[dict]]) -> Tree:
     """
-    TODO: docstring
-    :param data:
-    :return:
+    Creates a tree representation of the given data.
+    data represents the results of either read_buy_type or read_game for a given year.
     """
     t = Tree(f"VCT {data[0]}", [])
     for game in data[1]:
@@ -321,7 +324,7 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 
 def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
-    Returns a tree from the following data given as a Figure class object
+    Returns a tree from the following data of attack/defender scores given as a Figure class object.
     """
     i_d = 0
     g = Graph(directed=True)
@@ -382,12 +385,7 @@ def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict])
 
 def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
     """
-    TODO docstring
-    :param g:
-    :param cur_id:
-    :param data:
-    :param year:
-    :return:
+    Helper for function visualize_tree_game.
     """
     g.add_vertex('VCT ' + year)
     g.add_edge('VCT', 'VCT ' + year)
@@ -430,11 +428,7 @@ def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) 
 
 def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
-
-    :param data1:
-    :param data2:
-    :param data3:
-    :return:
+    Returns a tree from the following data of buy types given as a Figure class object.
     """
     i_d = 0
     g = Graph(directed=True)
@@ -494,6 +488,9 @@ def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) 
 
 
 def visual_tree_econ_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
+    """
+    Helper for visualize_tree_eco.
+    """
     g.add_vertex('VCT ' + year)
     g.add_edge('VCT', 'VCT ' + year)
     for game in data:
