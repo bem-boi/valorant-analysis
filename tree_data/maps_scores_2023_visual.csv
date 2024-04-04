@@ -1,0 +1,51 @@
+Tournament,Stage,Match Type,Match Name,Map,Team A,Team A Score,Team A Attacker Score,Team A Defender Score,Team A Overtime Score,Team B,Team B Score,Team B Attacker Score,Team B Defender Score,Team B Overtime Score,Duration
+Valorant Champions 2023,Group Stage,Opening (D),Team Liquid vs Natus Vincere,Fracture,Team Liquid,11,6,5,,Natus Vincere,13,7,6,,1:18:55
+Valorant Champions 2023,Group Stage,Opening (D),Team Liquid vs Natus Vincere,Bind,Team Liquid,15,7,5,3,Natus Vincere,17,7,5,5,1:22:57
+Valorant Champions 2023,Group Stage,Opening (D),DRX vs LOUD,Lotus,DRX,13,7,5,1,LOUD,15,7,5,3,1:17:19
+Valorant Champions 2023,Group Stage,Opening (D),DRX vs LOUD,Split,DRX,13,8,5,,LOUD,6,2,4,,47:47
+Valorant Champions 2023,Group Stage,Opening (D),DRX vs LOUD,Ascent,DRX,13,8,5,,LOUD,8,4,4,,
+Valorant Champions 2023,Group Stage,Opening (B),FUT Esports vs T1,Pearl,FUT Esports,13,9,4,,T1,4,1,3,,50:32
+Valorant Champions 2023,Group Stage,Opening (B),FUT Esports vs T1,Haven,FUT Esports,13,7,6,,T1,7,2,5,,41:49
+Valorant Champions 2023,Group Stage,Opening (B),Evil Geniuses vs FunPlus Phoenix,Ascent,Evil Geniuses,13,6,7,,FunPlus Phoenix,8,2,6,,55:48
+Valorant Champions 2023,Group Stage,Opening (B),Evil Geniuses vs FunPlus Phoenix,Pearl,Evil Geniuses,13,9,4,,FunPlus Phoenix,8,5,3,,47:22
+Valorant Champions 2023,Group Stage,Winner's (D),Natus Vincere vs DRX,Bind,Natus Vincere,13,8,4,1,DRX,15,8,4,3,1:17:30
+Valorant Champions 2023,Group Stage,Winner's (D),Natus Vincere vs DRX,Split,Natus Vincere,13,6,7,,DRX,9,3,6,,51:50
+Valorant Champions 2023,Group Stage,Winner's (D),Natus Vincere vs DRX,Lotus,Natus Vincere,12,6,6,0,DRX,14,6,6,2,
+Valorant Champions 2023,Group Stage,Opening (C),NRG Esports vs Bilibili Gaming,Lotus,NRG Esports,12,7,5,0,Bilibili Gaming,14,7,5,2,1:01:04
+Valorant Champions 2023,Group Stage,Opening (C),NRG Esports vs Bilibili Gaming,Split,NRG Esports,8,4,4,,Bilibili Gaming,13,5,8,,46:45
+Valorant Champions 2023,Group Stage,Opening (C),FNATIC vs ZETA DIVISION,Fracture,FNATIC,13,8,5,,ZETA DIVISION,5,1,4,,50:09
+Valorant Champions 2023,Group Stage,Opening (C),FNATIC vs ZETA DIVISION,Haven,FNATIC,13,7,6,,ZETA DIVISION,6,1,5,,45:05
+Valorant Champions 2023,Group Stage,Winner's (B),Evil Geniuses vs FUT Esports,Pearl,Evil Geniuses,15,9,3,3,FUT Esports,13,9,3,1,1:13:09
+Valorant Champions 2023,Group Stage,Winner's (B),Evil Geniuses vs FUT Esports,Bind,Evil Geniuses,13,6,7,,FUT Esports,9,3,6,,50:36
+Valorant Champions 2023,Group Stage,Opening (A),Paper Rex vs KRÜ Esports,Split,Paper Rex,13,8,5,,KRÜ Esports,7,3,4,,58:16
+Valorant Champions 2023,Group Stage,Opening (A),Paper Rex vs KRÜ Esports,Pearl,Paper Rex,13,8,5,,KRÜ Esports,8,4,4,,48:43
+Valorant Champions 2023,Group Stage,Opening (A),EDward Gaming vs Giants Gaming,Split,EDward Gaming,13,3,9,1,Giants Gaming,15,3,9,3,1:19:18
+Valorant Champions 2023,Group Stage,Opening (A),EDward Gaming vs Giants Gaming,Bind,EDward Gaming,13,6,7,,Giants Gaming,11,5,6,,55:05
+Valorant Champions 2023,Group Stage,Opening (A),EDward Gaming vs Giants Gaming,Ascent,EDward Gaming,13,7,6,,Giants Gaming,8,3,5,,
+Valorant Champions 2023,Group Stage,Winner's (C),FNATIC vs Bilibili Gaming,Haven,FNATIC,13,10,3,,Bilibili Gaming,2,0,2,,43:06
+Valorant Champions 2023,Group Stage,Winner's (C),FNATIC vs Bilibili Gaming,Lotus,FNATIC,13,9,4,,Bilibili Gaming,8,5,3,,52:39
+Valorant Champions 2023,Group Stage,Elimination (D),Team Liquid vs LOUD,Haven,Team Liquid,2,2,0,,LOUD,13,3,10,,54:59
+Valorant Champions 2023,Group Stage,Elimination (D),Team Liquid vs LOUD,Split,Team Liquid,8,6,2,,LOUD,13,7,6,,1:01:40
+Valorant Champions 2023,Group Stage,Elimination (B),FunPlus Phoenix vs T1,Lotus,FunPlus Phoenix,10,7,3,,T1,13,8,5,,1:03:03
+Valorant Champions 2023,Group Stage,Elimination (B),FunPlus Phoenix vs T1,Bind,FunPlus Phoenix,7,3,4,,T1,13,4,9,,49:05
+Valorant Champions 2023,Group Stage,Winner's (A),Paper Rex vs EDward Gaming,Fracture,Paper Rex,13,8,5,,EDward Gaming,7,3,4,,48:45
+Valorant Champions 2023,Group Stage,Winner's (A),Paper Rex vs EDward Gaming,Pearl,Paper Rex,16,5,7,4,EDward Gaming,14,5,7,2,1:04:11
+Valorant Champions 2023,Group Stage,Elimination (A),KRÜ Esports vs Giants Gaming,Lotus,KRÜ Esports,10,7,3,,Giants Gaming,13,8,5,,1:07:37
+Valorant Champions 2023,Group Stage,Elimination (A),KRÜ Esports vs Giants Gaming,Pearl,KRÜ Esports,12,5,7,0,Giants Gaming,14,5,7,2,1:07:48
+Valorant Champions 2023,Group Stage,Elimination (C),ZETA DIVISION vs NRG Esports,Bind,ZETA DIVISION,13,7,5,1,NRG Esports,15,7,5,3,-
+Valorant Champions 2023,Group Stage,Elimination (C),ZETA DIVISION vs NRG Esports,Haven,ZETA DIVISION,1,1,0,,NRG Esports,13,2,11,,34:49
+Valorant Champions 2023,Group Stage,Decider (D),Natus Vincere vs LOUD,Pearl,Natus Vincere,13,8,5,,LOUD,11,7,4,,1:16:45
+Valorant Champions 2023,Group Stage,Decider (D),Natus Vincere vs LOUD,Ascent,Natus Vincere,11,6,5,,LOUD,13,7,6,,58:56
+Valorant Champions 2023,Group Stage,Decider (D),Natus Vincere vs LOUD,Bind,Natus Vincere,11,5,6,,LOUD,13,6,7,,
+Valorant Champions 2023,Group Stage,Decider (B),FUT Esports vs T1,Bind,FUT Esports,13,10,3,,T1,10,8,2,,51:48
+Valorant Champions 2023,Group Stage,Decider (B),FUT Esports vs T1,Pearl,FUT Esports,14,7,5,2,T1,12,7,5,0,1:01:07
+Valorant Champions 2023,Group Stage,Decider (A),EDward Gaming vs Giants Gaming,Split,EDward Gaming,13,9,4,,Giants Gaming,6,3,3,,59:38
+Valorant Champions 2023,Group Stage,Decider (A),EDward Gaming vs Giants Gaming,Fracture,EDward Gaming,13,8,5,,Giants Gaming,7,3,4,,47:05
+Valorant Champions 2023,Group Stage,Decider (C),Bilibili Gaming vs NRG Esports,Bind,Bilibili Gaming,13,5,8,,NRG Esports,10,3,7,,1:04:04
+Valorant Champions 2023,Group Stage,Decider (C),Bilibili Gaming vs NRG Esports,Ascent,Bilibili Gaming,13,8,5,,NRG Esports,5,1,4,,40:36
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,FNATIC vs LOUD,Ascent,FNATIC,11,6,5,,LOUD,13,7,6,,1:09:19
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,FNATIC vs LOUD,Lotus,FNATIC,6,4,2,,LOUD,13,5,8,,44:40
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,Paper Rex vs FUT Esports,Ascent,Paper Rex,13,4,9,,FUT Esports,10,2,8,,54:58
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,Paper Rex vs FUT Esports,Pearl,Paper Rex,13,11,2,,FUT Esports,4,3,1,,38:42
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,DRX vs Bilibili Gaming,Lotus,DRX,13,2,11,,Bilibili Gaming,10,0,10,,1:04:41
+Valorant Champions 2023,Playoffs,Upper Quarterfinals,DRX vs Bilibili Gaming,Haven,DRX,13,7,6,,Bilibili Gaming,9,4,5,,48:59

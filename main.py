@@ -18,13 +18,13 @@ map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, vi
 
 
 # INITIALIZE DATA FOR TREE #
-game_file_2021_vis = open('tree_data/testy_test.txt')
-game_file_2022_vis = open('tree_data/testy_test.txt')
-game_file_2023_vis = open('tree_data/testy_test.txt')
+game_file_2021_vis = open('tree_data/maps_scores_2021_visual.csv')
+game_file_2022_vis = open('tree_data/maps_scores_2022_visual.csv')
+game_file_2023_vis = open('tree_data/maps_scores_2023_visual.csv')
 
-eco_file_2021_vis = open('tree_data/testy_test_eco.txt')
-eco_file_2022_vis = open('tree_data/testy_test_eco.txt')
-eco_file_2023_vis = open('tree_data/testy_test_eco.txt')
+eco_file_2021_vis = open('tree_data/eco_data_2021_visual.csv')
+eco_file_2022_vis = open('tree_data/eco_data_2022_visual.csv')
+eco_file_2023_vis = open('tree_data/eco_data_2023_visual.csv')
 
 game_data_2021_vis = read_game(game_file_2021_vis)
 game_data_2022_vis = read_game(game_file_2022_vis)
