@@ -637,7 +637,7 @@ if __name__ == '__main__':
             game_dat = read_game(game_file)
 
         with open('tree_data/testy_test_eco.txt') as eco_file:
-            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/eco_rounds_202' + str(x) + '.csv'
+            # after testing replace 'tree_data/testy_test.txt' with 'tree_data/new_eco_data_202' + str(x) + '.csv'
             eco_dat = read_buy_type(eco_file)
 
         game_datas.append(game_dat)
