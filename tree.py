@@ -356,46 +356,46 @@ def read_buy_type(eco_data: TextIO) -> tuple[str, list[dict]]:
     year = line[0].split()[2]
 
     while line[0] != '':
-            game = {}
-            matches = {}
-            match_name = line[3]
-            match_map = line[4]
-            round_num = int(line[5])
+        game = {}
+        matches = {}
+        match_name = line[3]
+        match_map = line[4]
+        round_num = int(line[5])
 
-            outcome = line[10]
-            if outcome == 'Loss':
-                line = eco_data.readline().strip().split(',')
-                winning_team = line[6]
-                type_buy = line[9]
-                matches[match_map] = {round_num: (winning_team, type_buy)}
-            else:
-                winning_team = line[6]
-                type_buy = line[9]
-                matches[match_map] = {round_num: (winning_team, type_buy)}
-                eco_data.readline().strip().split(',')
-
+        outcome = line[10]
+        if outcome == 'Loss':
             line = eco_data.readline().strip().split(',')
-            while line[0] != '' and line[3] == match_name:
-                match_map = line[4]
-                if match_map in matches:
-                    if line[10] == 'Loss':
-                        line = eco_data.readline().strip().split(',')
-                        matches[match_map][int(line[5])] = (line[6], line[9])
-                    else:
-                        matches[match_map][int(line[5])] = (line[6], line[9])
-                        eco_data.readline().strip().split(',')
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+        else:
+            winning_team = line[6]
+            type_buy = line[9]
+            matches[match_map] = {round_num: (winning_team, type_buy)}
+            eco_data.readline().strip().split(',')
+
+        line = eco_data.readline().strip().split(',')
+        while line[0] != '' and line[3] == match_name:
+            match_map = line[4]
+            if match_map in matches:
+                if line[10] == 'Loss':
+                    line = eco_data.readline().strip().split(',')
+                    matches[match_map][int(line[5])] = (line[6], line[9])
                 else:
-                    if line[10] == 'Loss':
-                        line = eco_data.readline().strip().split(',')
-                        matches[match_map] = {int(line[5]): (line[6], line[9])}
-                    else:
-                        matches[match_map] = {int(line[5]): (line[6], line[9])}
-                        eco_data.readline().strip().split(',')
-                line = eco_data.readline().strip().split(',')
+                    matches[match_map][int(line[5])] = (line[6], line[9])
+                    eco_data.readline().strip().split(',')
+            else:
+                if line[10] == 'Loss':
+                    line = eco_data.readline().strip().split(',')
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                else:
+                    matches[match_map] = {int(line[5]): (line[6], line[9])}
+                    eco_data.readline().strip().split(',')
+            line = eco_data.readline().strip().split(',')
 
         game[match_name] = matches
         info.append(game)
-    return year, info
+    return (year, info)
 
 
 def generate_tree(data: tuple[str, list[dict]]) -> Tree:
