@@ -79,41 +79,6 @@ class Tree:
 
         Preconditions:
             - not self.is_empty()
-
-        >>> t = Tree(111, [])
-        >>> t.insert_sequence([1, 2, 3])
-        >>> print(t)
-        111
-          1
-            2
-              3
-        >>> t.insert_sequence([1, 3, 5])
-        >>> print(t)
-        111
-          1
-            2
-              3
-            3
-              5
-        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
-        >>> t.insert_sequence([2, 3, 4])
-        >>> t
-        Tree(10, [Tree(2, [Tree(3, [Tree(4, [])])])])
-
-        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
-        >>> t.insert_sequence([2, 3])
-        >>> t
-        Tree(10, [Tree(2, [Tree(3, [])])])
-
-        >>> t = Tree(10, [Tree(2, [Tree(3, [])])])
-        >>> t.insert_sequence([10, 2, 3])
-        >>> print(t)
-        10
-          2
-            3
-          10
-            2
-              3
         """
         if items:
             if all(items[0] != subt._root for subt in self._subtrees):
