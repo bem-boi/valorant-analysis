@@ -563,7 +563,7 @@ if __name__ == '__main__':
 
         python_ta.check_all(config={
             'max-line-length': 120,
-            'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
+            'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs', 'dash.html'],
             'allowed-io': [],
             'max-nested-blocks': 5
         })
