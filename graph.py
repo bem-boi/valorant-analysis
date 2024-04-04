@@ -514,6 +514,8 @@ def return_graph(map_ref: dict, agent_comb: list[set], role: str, cur_map: str,
     """
     Return a weighted graph from the following data as a Figure class object
 
+    The function takes in map_ref which is the data working with, agent_comb is the list of agents played by your
+    teammates, and role is the role you prefer to play, and cur_map is the current map played.
     Optional arguments:
         - view_agent_weights: hide or show the weights of agent-agent edges
     """

@@ -324,7 +324,9 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 
 def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
-    Returns a tree from the following data of attack/defender scores given as a Figure class object.
+    Returns a tree in the Figure class object from the following data of attack/defender scores given as lists of
+    dictionary. data1 represents the data from 2021, data2 represents the data from 2022, and data3 represents the data
+    from 2023.
     """
     i_d = 0
     g = Graph(directed=True)
@@ -385,7 +387,9 @@ def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict])
 
 def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
     """
-    Helper for function visualize_tree_game.
+    A helper function that returns the latest id for each node so that each node is distinguished from the other nodes.
+    This function adds the vertices and the edges between them. This function is used alongside the visualize_tree_game
+    function. The function takes in a graph, the current id, the data that is worked with, and the year of the data.
     """
     g.add_vertex('VCT ' + year)
     g.add_edge('VCT', 'VCT ' + year)
@@ -428,7 +432,9 @@ def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) 
 
 def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
-    Returns a tree from the following data of buy types given as a Figure class object.
+    Returns a tree in the Figure class object from the following data of buy types given as lists of
+    dictionary. data1 represents the data from 2021, data2 represents the data from 2022, and data3 represents the data
+    from 2023.
     """
     i_d = 0
     g = Graph(directed=True)
@@ -489,7 +495,9 @@ def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) 
 
 def visual_tree_econ_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
     """
-    Helper for visualize_tree_eco.
+    A helper function that returns the latest id for each node so that each node is distinguished from the other nodes.
+    This function adds the vertices and the edges between them. This function is used alongside the visualize_tree_eco
+    function. The function takes in a graph, the current id, the data that is worked with, and the year of the data.
     """
     g.add_vertex('VCT ' + year)
     g.add_edge('VCT', 'VCT ' + year)
