@@ -303,6 +303,7 @@ def generate_weighted_graph(map_ref: dict[str, dict[str, list]], agent_combos: l
                 g.add_edge(cu_map, agent_name, round(weight, 2))
 
     if view_agent_weights:
+        # calculate and add the weights of agent-agent edges to g
         for agent_combo in agent_combos:
             add_agent_combo(agent_combo, g)
 
@@ -327,9 +328,10 @@ def calc_map_agent_weight(data: list) -> float:
 
 def add_agent_combo(agent_combination: set, g: WeightedGraph) -> None:
     """
-    Update the weights of all agent pairs in agent_combination to the graph g (increment by 1).
-    If any agent pair doesn't exist in g, add it to g (with a weight of 1).
+    Update the weights of all agent pairs in agent_combination to the graph g (increment by 1)
+    If any agent pair doesn't exist in g, add it to g (with a weight of 1)
     If an agent in agent_combination doesn't exist in g, don't do anything
+    This is a helper function to calculate and add the weights of agent-agent edges
 
     >>> g = WeightedGraph()
     >>> g.add_vertex('jett', 'agent', 'duelists')
