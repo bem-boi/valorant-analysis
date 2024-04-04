@@ -69,7 +69,7 @@ app.layout = html.Div([
     html.H1('Valorant Analysis App'),
     dcc.Tabs(id="tabs", value='tab-1', children=[
         dcc.Tab(label='Which Agents to play', value='tab-1'),
-        dcc.Tab(label='Eco-Round', value='tab-2'),
+        dcc.Tab(label='Most effective buy', value='tab-2'),
         dcc.Tab(label='Attacker or Defender-sided', value='tab-3')
     ]),
     html.Div(id='tabs-content')
@@ -115,7 +115,7 @@ def render_content(tab):
         ])
     elif tab == 'tab-2':
         return html.Div([
-            html.H3('Eco-Round'),
+            html.H3('Most effective buy'),
             html.Hr(),
             dcc.RadioItems(
                 ['ascent',
