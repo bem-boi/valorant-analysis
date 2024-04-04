@@ -6,7 +6,6 @@ from graph import (clean_agents_pick_file, clean_teams_picked_agents_file, load_
 
 from tree import visualize_tree_game, read_game, read_buy_type, generate_tree, Tree, visualize_tree_eco
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # INITIALIZE DATA FOR GRAPH #
 cleaned_agf_file = clean_agents_pick_file('graph_data/agents_pick_rates2023.csv')
