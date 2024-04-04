@@ -543,7 +543,6 @@ def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) 
     )
 
     # Show the interactive plot
-    fig.show()
     return fig
 
 
@@ -601,8 +600,9 @@ if __name__ == '__main__':
     eco_tree = Tree('VCT buy types', [])
     eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
-    # current_map = input("What map are you playing?").lower()
-    # print("This map " + vct_tree.best_side_for_map(current_map))
-    # print(eco_tree.best_buy_for_map(current_map))
+    current_map = input("What map are you playing?").lower()
+    print("This map " + vct_tree.best_side_for_map(current_map))
+    print(eco_tree.best_buy_for_map(current_map))
 
     # visualize_tree_eco(eco_data_2021[1], eco_data_2022[1], eco_data_2023[1])
+    # visualize_tree_game(game_data_2021[1], game_data_2022[1], game_data_2023[1])

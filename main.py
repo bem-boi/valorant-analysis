@@ -19,6 +19,22 @@ map_agent_graph = generate_weighted_graph(map_agent_data, agent_combinations, vi
 
 
 # INITIALIZE DATA FOR TREE #
+game_file_2021_vis = open('tree_data/testy_test.txt')
+game_file_2022_vis = open('tree_data/testy_test.txt')
+game_file_2023_vis = open('tree_data/testy_test.txt')
+
+eco_file_2021_vis = open('tree_data/testy_test_eco.txt')
+eco_file_2022_vis = open('tree_data/testy_test_eco.txt')
+eco_file_2023_vis = open('tree_data/testy_test_eco.txt')
+
+game_data_2021_vis = read_game(game_file_2021_vis)
+game_data_2022_vis = read_game(game_file_2022_vis)
+game_data_2023_vis = read_game(game_file_2023_vis)
+
+eco_data_2021_vis = read_buy_type(eco_file_2021_vis)
+eco_data_2022_vis = read_buy_type(eco_file_2022_vis)
+eco_data_2023_vis = read_buy_type(eco_file_2023_vis)
+
 game_file_2021 = open('tree_data/maps_scores_2021.csv')
 game_file_2022 = open('tree_data/maps_scores_2022.csv')
 game_file_2023 = open('tree_data/maps_scores_2023.csv')
@@ -109,10 +125,10 @@ def render_content(tab):
                  'icebox',
                  'fracture',
                  'bind',
-                 'haven', 'all'], 'ascent', inline=True, id='choice2_2'),
-            dcc.Graph(figure=visualize_tree_eco(eco_data_2021[1], eco_data_2022[1], eco_data_2023[1])),
+                 'haven'], 'ascent', inline=True, id='choice2_2'),
+            dcc.Graph(figure=visualize_tree_eco(eco_data_2021_vis[1], eco_data_2022_vis[1], eco_data_2023_vis[1])),
             html.Div(id='text_eco',
-                     children=eco_tree.best_buy_for_map('ascent')),
+                     children=eco_tree.best_buy_for_map('ascent') + ' on ascent'),
         ])
     elif tab == 'tab-3':
         return html.Div([
@@ -126,10 +142,10 @@ def render_content(tab):
                  'icebox',
                  'fracture',
                  'bind',
-                 'haven', 'all'], 'ascent', inline=True, id='choice2_3'),
-            dcc.Graph(figure=visualize_tree_game(game_data_2021[1], game_data_2022[1], game_data_2023[1])),
+                 'haven'], 'ascent', inline=True, id='choice2_3'),
+            dcc.Graph(figure=visualize_tree_game(game_data_2021_vis[1], game_data_2022_vis[1], game_data_2023_vis[1])),
             html.Div(id='text_ct',
-                     children=vct_tree.best_side_for_map('ascent')),
+                     children='ascent ' + vct_tree.best_side_for_map('ascent')),
         ])
 
     html.Div(id='tabs-content')
@@ -205,7 +221,7 @@ def update_output(choice2, button, input):
     Input('choice2_2', 'value'),
     prevent_initial_call=True)
 def update_output(choice2):
-    return eco_tree.best_buy_for_map(choice2)
+    return eco_tree.best_buy_for_map(choice2) + ' on ' + choice2
 
 
 @callback(
@@ -213,7 +229,7 @@ def update_output(choice2):
     Input('choice2_3', 'value'),
     prevent_initial_call=True)
 def update_output(choice2):
-    return vct_tree.best_side_for_map(choice2)
+    return choice2 + ' ' + vct_tree.best_side_for_map(choice2)
 
 
 # ---------------------------------------------- which agent to play ------------------------------------------------ #
