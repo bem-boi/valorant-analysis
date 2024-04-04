@@ -1,4 +1,4 @@
-# CSC111 Winter 2024: Python libraries we'll be using this semester.
+# All required liraries to be installed to run all modules in this project
 
 # Testing and code checking
 hypothesis
@@ -10,7 +10,6 @@ plotly>=5.18.0
 pygame==2.5.2
 dash~=2.16.1
 
-# Specific to a later exercise
 networkx~=3.2.1
 numpy
 scipy

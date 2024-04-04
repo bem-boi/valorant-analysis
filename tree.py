@@ -217,11 +217,11 @@ class Tree:
                                 attack += subtree5._root[0]
                                 defend += subtree5._root[1]
         if attack > defend:
-            return "Attacker sided"
+            return "is Attacker sided"
         if attack < defend:
-            return "Defender sided"
+            return "is Defender sided"
         else:
-            return "Map favours both sides"
+            return "favours both sides"
 
     def best_buy_for_map(self, map_played: str) -> str:
         """
@@ -274,7 +274,7 @@ def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
     :return:
     """
     info = []
-    line = game_data.readline()
+    game_data.readline()
     line = game_data.readline().strip().split(',')
 
     year = line[0].split()[2]
@@ -378,12 +378,12 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 # ---MAIN---
 if __name__ == '__main__':
     game_file_2021 = open('tree_data/maps_scores_21.csv')
-    game_file_2022 = open('tree_data/maps_scores_2022.csv')
+    game_file_2022 = open('tree_data/maps_scores_22.csv')
     game_file_2023 = open('tree_data/maps_scores_2023.csv')
 
-    eco_file_2021 = open('tree_data/eco_rounds_2021.csv')
-    eco_file_2022 = open('tree_data/eco_rounds_2022.csv')
-    eco_file_2023 = open('tree_data/eco_rounds_2023.csv')
+    eco_file_2021 = open('tree_data/new_eco_data_2021.csv')
+    eco_file_2022 = open('tree_data/new_eco_data_2022.csv')
+    eco_file_2023 = open('tree_data/new_eco_data_2023.csv')
 
     game_data_2021 = read_game(game_file_2021)
     game_data_2022 = read_game(game_file_2022)
@@ -408,5 +408,5 @@ if __name__ == '__main__':
     eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
     current_map = input("What map are you playing?").lower()
-    print("This map is " + vct_tree.best_side_for_map(current_map))
+    print("This map " + vct_tree.best_side_for_map(current_map))
     print(eco_tree.best_buy_for_map(current_map))
