@@ -9,7 +9,6 @@ from igraph import Graph
 import plotly.graph_objects as go
 
 
-
 class Tree:
     """A recursive tree graph_data structure.
 
@@ -58,52 +57,6 @@ class Tree:
         else:
             return 1 + sum(subtree.__len__() for subtree in self._subtrees)
 
-    def __contains__(self, item: Any) -> bool:
-        """Return whether the given is in this tree.
-
-        >>> t = Tree(1, [Tree(2, []), Tree(5, [])])
-        >>> t.__contains__(1)
-        True
-        >>> t.__contains__(5)
-        True
-        >>> t.__contains__(4)
-        False
-        """
-        if self.is_empty():
-            return False
-        elif self._root == item:
-            return True
-        else:
-            for subtree in self._subtrees:
-                if subtree.__contains__(item):
-                    return True
-            return False
-
-    def __str__(self) -> str:
-        """Return a string representation of this tree.
-
-        For each node, its item is printed before any of its
-        descendants' items. The output is nicely indented.
-
-        You may find this method helpful for debugging.
-        """
-        return self._str_indented(0).rstrip()
-
-    def _str_indented(self, depth: int) -> str:
-        """Return an indented string representation of this tree.
-
-        The indentation level is specified by the <depth> parameter.
-        """
-        if self.is_empty():
-            return ''
-        else:
-            str_so_far = '  ' * depth + f'{self._root}\n'
-            for subtree in self._subtrees:
-                # Note that the 'depth' argument to the recursive call is
-                # modified.
-                str_so_far += subtree._str_indented(depth + 1)
-            return str_so_far
-
     def __repr__(self) -> str:
         """Return a one-line string representation of this tree.
 
@@ -123,22 +76,6 @@ class Tree:
             - etc.
 
         Do nothing if items is empty.
-
-        The root of this chain (i.e. items[0]) should be added as a new subtree within this tree, as long as items[0]
-        does not already exist as a child of the current root node. That is, create a new subtree for it
-        and append it to this tree's existing list of subtrees.
-
-        If items[0] is already a child of this tree's root, instead recurse into that existing subtree rather
-        than create a new subtree with items[0]. If there are multiple occurrences of items[0] within this tree's
-        children, pick the left-most subtree with root value items[0] to recurse into.
-
-        Hints:
-
-        To do this recursively, you'll need to recurse on both the tree argument
-        (from self to a subtree) AND on the given items, using the "first" and "rest" idea
-        from RecursiveLists. To access the "rest" of a built-in Python list, you can use
-        list slicing: items[1:len(items)] or simply items[1:], or you can use a recursive helper method
-        that takes an extra "current index" argument to keep track of the next move in the list to add.
 
         Preconditions:
             - not self.is_empty()
@@ -442,6 +379,14 @@ def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict])
 
 
 def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
+    """
+    TODO docstring
+    :param g:
+    :param cur_id:
+    :param data:
+    :param year:
+    :return:
+    """
     g.add_vertex('VCT ' + year)
     g.add_edge('VCT', 'VCT ' + year)
     for game in data:
@@ -570,39 +515,45 @@ def visual_tree_econ_helper(g: Graph, cur_id: int, data: list[dict], year: str) 
 
 # ---MAIN---
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/maps_scores_2021.csv')
-    game_file_2022 = open('tree_data/maps_scores_2022.csv')
-    game_file_2023 = open('tree_data/maps_scores_2023.csv')
+    if __name__ == '__main__':
+        game_datas = []
+        eco_datas = []
+        game_trees, eco_trees = [], []
+        for x in range(1, 4):
+            with open('tree_data/maps_scores_202' + str(x) + '.csv') as game_file:
+                game_dat = read_game(game_file)
 
-    eco_file_2021 = open('tree_data/eco_data_2021.csv')
-    eco_file_2022 = open('tree_data/eco_data_2022.csv')
-    eco_file_2023 = open('tree_data/eco_data_2023.csv')
+            with open('tree_data/eco_rounds_202' + str(x) + '.csv') as eco_file:
+                eco_dat = read_buy_type(eco_file)
 
-    game_data_2021 = read_game(game_file_2021)
-    game_data_2022 = read_game(game_file_2022)
-    game_data_2023 = read_game(game_file_2023)
+            game_datas.append(game_dat)
+            eco_datas.append(eco_dat)
+            game_trees.append(generate_tree(game_dat))
+            eco_trees.append(generate_tree(eco_dat))
 
-    eco_data_2021 = read_buy_type(eco_file_2021)
-    eco_data_2022 = read_buy_type(eco_file_2022)
-    eco_data_2023 = read_buy_type(eco_file_2023)
+        vct_tree = Tree('VCT', [])
+        vct_tree.combine_all(game_trees)
 
-    game_tree_2021 = generate_tree(game_data_2021)
-    game_tree_2022 = generate_tree(game_data_2022)
-    game_tree_2023 = generate_tree(game_data_2023)
+        eco_tree = Tree('VCT buy types', [])
+        eco_tree.combine_all(eco_trees)
 
-    eco_tree_2021 = generate_tree(eco_data_2021)
-    eco_tree_2022 = generate_tree(eco_data_2022)
-    eco_tree_2023 = generate_tree(eco_data_2023)
+        current_map = input("What map are you playing?").lower()
+        print("This map " + vct_tree.best_side_for_map(current_map))
+        print(eco_tree.best_buy_for_map(current_map))
+        visualize_tree_game(game_datas[0][1], game_datas[1][1], game_datas[2][1])
+        visualize_tree_eco(eco_datas[0][1], eco_datas[1][1], eco_datas[2][1])
 
-    vct_tree = Tree('VCT', [])
-    vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
+        import doctest
 
-    eco_tree = Tree('VCT buy types', [])
-    eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
+        doctest.testmod()
+        import python_ta
 
-    current_map = input("What map are you playing?").lower()
-    print("This map " + vct_tree.best_side_for_map(current_map))
-    print(eco_tree.best_buy_for_map(current_map))
+        python_ta.check_all(config={
+            'max-line-length': 120,
+            'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
+            'allowed-io': [],
+            'max-nested-blocks': 5
+        })
 
     # visualize_tree_eco(eco_data_2021[1], eco_data_2022[1], eco_data_2023[1])
     # visualize_tree_game(game_data_2021[1], game_data_2022[1], game_data_2023[1])
