@@ -1,4 +1,4 @@
-# All required liraries to be installed to run all modules in this project
+# All required libraries to be installed to run all modules in this project
 
 # Testing and code checking
 hypothesis
