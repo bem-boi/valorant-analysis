@@ -142,6 +142,10 @@ class Tree:
             for subtree in self._subtrees:
                 subtree._insert_helper(items[1:])
 
+    def _best_side_helper(self) -> tuple[int, int]:
+        for subtree in self._subtrees:
+            return (subtree._root[0], subtree._root[1])
+
     def best_side_for_map(self, map_played: str) -> str:
         """
         Returns a string stating whether the user is more likely to win on the given map (map_player)
@@ -154,9 +158,7 @@ class Tree:
                 for subtree3 in subtree2._subtrees:
                     if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
-                            for subtree5 in subtree4._subtrees:
-                                attack += subtree5._root[0]
-                                defend += subtree5._root[1]
+                            attack, defend = subtree4.best_side_for_map()
         if attack > defend:
             return "is Attacker sided"
         if attack < defend:
@@ -164,9 +166,16 @@ class Tree:
         else:
             return "favours both sides"
 
-    def _best_buy_helper(self) -> str:
+    def _best_buy_helper(self, eco: int, semi_eco: int, semi_buy: int, full: int) -> str:
         for subtree in self._subtrees:
-            return subtree._root[1]
+            if subtree._root[1] == 'Eco: 0-5k':
+                eco += 1
+            elif subtree._root[1] == 'Semi-eco: 5-10k':
+                semi_eco += 1
+            elif subtree._root[1] == 'Semi-buy: 10-20k':
+                semi_buy += 1
+            else:
+                full += 1
 
     def best_buy_for_map(self, map_played: str) -> str:
         """
@@ -187,15 +196,7 @@ class Tree:
                 for subtree3 in subtree2._subtrees:
                     if subtree3._root.lower() == map_played:
                         for subtree4 in subtree3._subtrees:
-                            buy = subtree4._best_buy_helper()
-                            if buy == 'Eco: 0-5k':
-                                eco += 1
-                            elif buy == 'Semi-eco: 5-10k':
-                                semi_eco += 1
-                            elif buy == 'Semi-buy: 10-20k':
-                                semi_buy += 1
-                            else:
-                                full += 1
+                            subtree4._best_buy_helper(eco, semi_eco, semi_buy, full)
         all_buys = [eco, semi_eco, semi_buy, full]
         if max(all_buys) == eco:
             return 'Eco buy is most effective'
