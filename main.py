@@ -70,7 +70,7 @@ app.layout = html.Div([
     dcc.Tabs(id="tabs", value='tab-1', children=[
         dcc.Tab(label='Which Agents to play', value='tab-1'),
         dcc.Tab(label='Eco-Round', value='tab-2'),
-        dcc.Tab(label='C/CT-sided', value='tab-3')
+        dcc.Tab(label='Attacker or Defender-sided', value='tab-3')
     ]),
     html.Div(id='tabs-content')
 ])
@@ -105,7 +105,8 @@ def render_content(tab):
             html.Div(dcc.Input(id='input_user_1', type='text')),
             html.Button('Submit', id='button_1'),
             html.Div(id='output-container-button_1',
-                     children='Enter a value and press submit'),
+                     children="Enter your teammates' agents in the form: (Agent1),(Agent2),...,(Agent4). "
+                              "or leave it blank"),
             html.Hr(),
             html.Div(dcc.Input(id='input_agent_1', type='text')),
             html.Button('Submit', id='button2_1'),
@@ -131,7 +132,7 @@ def render_content(tab):
         ])
     elif tab == 'tab-3':
         return html.Div([
-            html.H3('C/CT-sided'),
+            html.H3('Attacker or Defender-sided'),
             html.Hr(),
             dcc.RadioItems(
                 ['ascent',
