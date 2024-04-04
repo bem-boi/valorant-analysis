@@ -274,7 +274,7 @@ def read_game(game_data: TextIO) -> tuple[str, list[dict]]:
     :return:
     """
     info = []
-    game_data.readline()
+    line = game_data.readline()
     line = game_data.readline().strip().split(',')
 
     year = line[0].split()[2]
@@ -377,7 +377,7 @@ def generate_tree(data: tuple[str, list[dict]]) -> Tree:
 
 # ---MAIN---
 if __name__ == '__main__':
-    game_file_2021 = open('tree_data/maps_scores_2021.csv')
+    game_file_2021 = open('tree_data/maps_scores_21.csv')
     game_file_2022 = open('tree_data/maps_scores_2022.csv')
     game_file_2023 = open('tree_data/maps_scores_2023.csv')
 
