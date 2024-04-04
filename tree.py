@@ -144,9 +144,8 @@ class Tree:
 
     def best_side_for_map(self, map_played: str) -> str:
         """
-        TODO: docstring
-        :param map_played:
-        :return:
+        Returns a string stating whether the user is more likely to win on the given map (map_player)
+        as an Attacker or Defender based on the data from self.
         """
         attack = 0
         defend = 0
@@ -167,9 +166,13 @@ class Tree:
 
     def best_buy_for_map(self, map_played: str) -> str:
         """
-        TODO: docstring
-        :param map_played:
-        :return:
+        Returns a string stating which buy type is more likely to win based on the given map (map_played).
+        The buy types are:
+        - Eco-buy
+        - Semi-eco
+        - Semi-buy
+        - Full buy
+        Result is determined based on the data from self.
         """
         eco = 0
         semi_eco = 0
@@ -201,9 +204,8 @@ class Tree:
 
     def combine_all(self, trees: list) -> None:
         """
-        TODO: docstring
-        :param trees:
-        :return:
+        Combines all the trees in the input "trees" into one, where each tree corresponds to one year of the
+        tournament.
         """
         for tree in trees:
             self._subtrees.append(tree)
