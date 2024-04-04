@@ -4,7 +4,7 @@ from graph import (clean_agents_pick_file, clean_teams_picked_agents_file, load_
                    generate_weighted_graph, return_graph, clean_all_agents_file, load_agent_combo_data,
                    compatible_agents, best_agent_for_map)
 
-from tree import visualize_tree, read_game, read_buy_type, generate_tree, Tree
+from tree import visualize_tree_game, read_game, read_buy_type, generate_tree, Tree, visualize_tree_eco
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -45,7 +45,8 @@ eco_tree_2023 = generate_tree(eco_data_2023)
 
 vct_tree = Tree('VCT', [])
 vct_tree.combine_all([game_tree_2021, game_tree_2022, game_tree_2023])
-
+eco_tree = Tree('VCT buy types', [])
+eco_tree.combine_all([eco_tree_2021, eco_tree_2022, eco_tree_2023])
 
 app = Dash(__name__)
 
@@ -109,7 +110,9 @@ def render_content(tab):
                  'fracture',
                  'bind',
                  'haven', 'all'], 'ascent', inline=True, id='choice2_2'),
-            dcc.Graph(figure=visualize_tree(game_data_2021[1], game_data_2022[1], game_data_2023[1]))
+            dcc.Graph(figure=visualize_tree_eco(eco_data_2021[1], eco_data_2022[1], eco_data_2023[1])),
+            html.Div(id='text_eco',
+                     children=eco_tree.best_buy_for_map('ascent')),
         ])
     elif tab == 'tab-3':
         return html.Div([
@@ -123,7 +126,10 @@ def render_content(tab):
                  'icebox',
                  'fracture',
                  'bind',
-                 'haven', 'all'], 'ascent', inline=True, id='choice2_3')
+                 'haven', 'all'], 'ascent', inline=True, id='choice2_3'),
+            dcc.Graph(figure=visualize_tree_game(game_data_2021[1], game_data_2022[1], game_data_2023[1])),
+            html.Div(id='text_ct',
+                     children=vct_tree.best_side_for_map('ascent')),
         ])
 
     html.Div(id='tabs-content')
@@ -192,6 +198,22 @@ def update_output(choice2, button, input):
                     + str(list(list_of_agents.keys())) + ' which is in order of descending compatibility')
     else:
         return "Enter an agent you're playing and press submit."
+
+
+@callback(
+    Output('text_eco', 'children'),
+    Input('choice2_2', 'value'),
+    prevent_initial_call=True)
+def update_output(choice2):
+    return eco_tree.best_buy_for_map(choice2)
+
+
+@callback(
+    Output('text_ct', 'children'),
+    Input('choice2_3', 'value'),
+    prevent_initial_call=True)
+def update_output(choice2):
+    return vct_tree.best_side_for_map(choice2)
 
 
 # ---------------------------------------------- which agent to play ------------------------------------------------ #

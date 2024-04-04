@@ -441,123 +441,17 @@ def data_at_height(t: Tree, i: int) -> list:
         return nodes
 
 
-def visualize_tree(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
+def visualize_tree_game(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
     """
     Returns a tree from the following data given as a Figure class object
     """
     i_d = 0
     g = Graph(directed=True)
     g.add_vertex('VCT')
-    g.add_vertex('VCT 2021')
-    g.add_edge('VCT', 'VCT 2021')
-    for game in data1:
-        name_of_match = list(game.keys())[0]
-        maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(i_d))
-        g.add_edge(name_of_match + ' id: ' + str(i_d), 'VCT 2021')
-        name_of_match_id = i_d
-        for m in maps:
-            team_name = list(game[name_of_match][m])
-            team1 = team_name[0]
-            team2 = team_name[1]
-            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
-                                        list(game[name_of_match][m].values())[0][1])
-            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
-                                        list(game[name_of_match][m].values())[1][1])
-            i_d += 1
-            team1_id = i_d
-            g.add_vertex(team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            i_d += 1
-            team2_id = i_d
-            g.add_vertex(team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            i_d += 1
-            g.add_vertex(m + ' id: ' + str(i_d))
-            g.add_edge(m + ' id: ' + str(i_d), team1 + ' id: ' + str(team1_id))
-            g.add_edge(m + ' id: ' + str(i_d), team2 + ' id: ' + str(team2_id))
-            g.add_edge(m + ' id: ' + str(i_d), name_of_match + ' id: ' + str(name_of_match_id))
-        i_d += 1
 
-    g.add_vertex('VCT 2022')
-    g.add_edge('VCT', 'VCT 2022')
-    for game in data1:
-        name_of_match = list(game.keys())[0]
-        maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(i_d))
-        g.add_edge(name_of_match + ' id: ' + str(i_d), 'VCT 2022')
-        name_of_match_id = i_d
-        for m in maps:
-            team_name = list(game[name_of_match][m])
-            team1 = team_name[0]
-            team2 = team_name[1]
-            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
-                                        list(game[name_of_match][m].values())[0][1])
-            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
-                                        list(game[name_of_match][m].values())[1][1])
-            i_d += 1
-            team1_id = i_d
-            g.add_vertex(team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            i_d += 1
-            team2_id = i_d
-            g.add_vertex(team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            i_d += 1
-            g.add_vertex(m + ' id: ' + str(i_d))
-            g.add_edge(m + ' id: ' + str(i_d), team1 + ' id: ' + str(team1_id))
-            g.add_edge(m + ' id: ' + str(i_d), team2 + ' id: ' + str(team2_id))
-            g.add_edge(m + ' id: ' + str(i_d), name_of_match + ' id: ' + str(name_of_match_id))
-        i_d += 1
-
-    g.add_vertex('VCT 2023')
-    g.add_edge('VCT', 'VCT 2023')
-    for game in data1:
-        name_of_match = list(game.keys())[0]
-        maps = list(game[name_of_match].keys())
-        g.add_vertex(name_of_match + ' id: ' + str(i_d))
-        g.add_edge(name_of_match + ' id: ' + str(i_d), 'VCT 2023')
-        name_of_match_id = i_d
-        for m in maps:
-            team_name = list(game[name_of_match][m])
-            team1 = team_name[0]
-            team2 = team_name[1]
-            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
-                                        list(game[name_of_match][m].values())[0][1])
-            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
-                                        list(game[name_of_match][m].values())[1][1])
-            i_d += 1
-            team1_id = i_d
-            g.add_vertex(team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(i_d))
-            g.add_edge(team1 + ' id: ' + str(i_d), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(i_d))
-            i_d += 1
-            team2_id = i_d
-            g.add_vertex(team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(i_d))
-            g.add_edge(team2 + ' id: ' + str(i_d), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(i_d))
-            i_d += 1
-            g.add_vertex(m + ' id: ' + str(i_d))
-            g.add_edge(m + ' id: ' + str(i_d), team1 + ' id: ' + str(team1_id))
-            g.add_edge(m + ' id: ' + str(i_d), team2 + ' id: ' + str(team2_id))
-            g.add_edge(m + ' id: ' + str(i_d), name_of_match + ' id: ' + str(name_of_match_id))
-        i_d += 1
+    id_1 = visual_tree_game_helper(g, i_d, data1, '2021')
+    id_2 = visual_tree_game_helper(g, id_1, data2, '2022')
+    visual_tree_game_helper(g, id_2, data3, '2023')
 
     layt = g.layout("kk")
 
@@ -608,6 +502,133 @@ def visualize_tree(data1: list[dict], data2: list[dict], data3: list[dict]) -> F
     return fig
 
 
+def visual_tree_game_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
+    g.add_vertex('VCT ' + year)
+    g.add_edge('VCT', 'VCT ' + year)
+    for game in data:
+        name_of_match = list(game.keys())[0]
+        maps = list(game[name_of_match].keys())
+        g.add_vertex(name_of_match + ' id: ' + str(cur_id))
+        g.add_edge(name_of_match + ' id: ' + str(cur_id), 'VCT ' + year)
+        name_of_match_id = cur_id
+        for m in maps:
+            team_name = list(game[name_of_match][m])
+            team1 = team_name[0]
+            team2 = team_name[1]
+            team1attack, team1defend = (list(game[name_of_match][m].values())[0][0],
+                                        list(game[name_of_match][m].values())[0][1])
+            team2attack, team2defend = (list(game[name_of_match][m].values())[1][0],
+                                        list(game[name_of_match][m].values())[1][1])
+            cur_id += 1
+            team1_id = cur_id
+            g.add_vertex(team1 + ' id: ' + str(cur_id))
+            g.add_vertex(str(team1attack) + ' attack by ' + team1 + ' id: ' + str(cur_id))
+            g.add_vertex(str(team1defend) + ' defend by ' + team1 + ' id: ' + str(cur_id))
+            g.add_edge(team1 + ' id: ' + str(cur_id), str(team1attack) + ' attack by ' + team1 + ' id: ' + str(cur_id))
+            g.add_edge(team1 + ' id: ' + str(cur_id), str(team1defend) + ' defend by ' + team1 + ' id: ' + str(cur_id))
+            cur_id += 1
+            team2_id = cur_id
+            g.add_vertex(team2 + ' id: ' + str(cur_id))
+            g.add_vertex(str(team2attack) + ' attack by ' + team2 + ' id: ' + str(cur_id))
+            g.add_vertex(str(team2defend) + ' defend by ' + team2 + ' id: ' + str(cur_id))
+            g.add_edge(team2 + ' id: ' + str(cur_id), str(team2attack) + ' attack by ' + team2 + ' id: ' + str(cur_id))
+            g.add_edge(team2 + ' id: ' + str(cur_id), str(team2defend) + ' defend by ' + team2 + ' id: ' + str(cur_id))
+            cur_id += 1
+            g.add_vertex(m + ' id: ' + str(cur_id))
+            g.add_edge(m + ' id: ' + str(cur_id), team1 + ' id: ' + str(team1_id))
+            g.add_edge(m + ' id: ' + str(cur_id), team2 + ' id: ' + str(team2_id))
+            g.add_edge(m + ' id: ' + str(cur_id), name_of_match + ' id: ' + str(name_of_match_id))
+        cur_id += 1
+    return cur_id + 1
+
+
+def visualize_tree_eco(data1: list[dict], data2: list[dict], data3: list[dict]) -> Figure:
+    """
+
+    :param data1:
+    :param data2:
+    :param data3:
+    :return:
+    """
+    i_d = 0
+    g = Graph(directed=True)
+    g.add_vertex('VCT')
+
+    id_1 = visual_tree_econ_helper(g, i_d, data1, '2021')
+    id_2 = visual_tree_econ_helper(g, id_1, data2, '2022')
+    visual_tree_econ_helper(g, id_2, data3, '2023')
+
+    layt = g.layout("kk")
+
+    edge_x, edge_y = [], []
+    for edge in g.get_edgelist():
+        x0, y0 = layt[edge[0]]
+        x1, y1 = layt[edge[1]]
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+
+    # Get vertex coordinates and labels
+    node_x, node_y = zip(*[layt[vertex] for vertex in g.vs.indices])
+    # node_labels = [str(label) for label in g.vs.indices]
+    node_labels = g.vs['name']
+
+    # Create Plotly trace for edges
+    edge_trace = go.Scatter(
+        x=edge_x,
+        y=edge_y,
+        line={"width": 0.5, "color": '#888'},
+        hoverinfo="none",
+        mode="lines",
+    )
+
+    # Create Plotly trace for nodes
+    node_trace = go.Scatter(
+        x=node_x,
+        y=node_y,
+        mode="markers",
+        hoverinfo="text",
+        marker={"showscale": True, "colorscale": 'YlGnBu', "size": 10},
+        text=node_labels,  # Display node labels on hover
+    )
+
+    # Create a figure and add traces
+    fig = go.Figure(data=[edge_trace, node_trace])
+
+    # Customize layout
+    fig.update_layout(
+        showlegend=True,
+        hovermode="closest",
+        margin={"b": 0, "l": 0, "r": 0, "t": 0},
+        xaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
+        yaxis={"showgrid": False, "zeroline": False, "showticklabels": False},
+    )
+
+    # Show the interactive plot
+    return fig
+
+
+def visual_tree_econ_helper(g: Graph, cur_id: int, data: list[dict], year: str) -> int:
+    g.add_vertex('VCT ' + year)
+    g.add_edge('VCT', 'VCT ' + year)
+    for game in data:
+        name_of_match = list(game.keys())[0]
+        maps = list(game[name_of_match].keys())
+        g.add_vertex(name_of_match + ' id: ' + str(cur_id))
+        g.add_edge(name_of_match + ' id: ' + str(cur_id), 'VCT ' + year)
+        name_of_match_id = cur_id
+        for m in maps:
+            cur_id += 1
+            map_id = cur_id
+            g.add_vertex(m + ' id: ' + str(map_id))
+            for matches in game[name_of_match][m].values():
+                cur_id += 1
+                g.add_vertex(matches[0] + ' won by ' + matches[1] + ' id: ' + str(cur_id))
+                g.add_edge(matches[0] + ' won by ' + matches[1] + ' id: ' + str(cur_id), m + ' id: ' + str(map_id))
+            g.add_edge(m + ' id: ' + str(map_id), name_of_match + ' id: ' + str(name_of_match_id))
+        cur_id += 1
+    return cur_id + 1
+
+
 def create_tree_from_edges(edges: Any) -> Graph:
     """
     Returns a tree made from the edges given as an igraph Graph object
@@ -630,6 +651,7 @@ def create_tree_from_edges(edges: Any) -> Graph:
 # --------------------------------------------------- MAIN ---------------------------------------------------------- #
 if __name__ == '__main__':
     game_datas = []
+    eco_datas = []
     game_trees, eco_trees = [], []
     for x in range(1, 4):
         with open('tree_data/testy_test.txt') as game_file:
@@ -641,6 +663,7 @@ if __name__ == '__main__':
             eco_dat = read_buy_type(eco_file)
 
         game_datas.append(game_dat)
+        eco_datas.append(eco_dat)
         game_trees.append(generate_tree(game_dat))
         eco_trees.append(generate_tree(eco_dat))
 
@@ -650,18 +673,19 @@ if __name__ == '__main__':
     eco_tree = Tree('VCT buy types', [])
     eco_tree.combine_all(eco_trees)
 
-    # current_map = input("What map are you playing?").lower()
-    # print("This map is " + vct_tree.best_side_for_map(current_map))
-    # print(eco_tree.best_buy_for_map(current_map))
-    visualize_tree(game_datas[0][1], game_datas[0][1], game_datas[0][1])
+    current_map = input("What map are you playing?").lower()
+    print("This map is " + vct_tree.best_side_for_map(current_map))
+    print(eco_tree.best_buy_for_map(current_map))
+    visualize_tree_game(game_datas[0][1], game_datas[1][1], game_datas[2][1])
+    visualize_tree_eco(eco_datas[0][1], eco_datas[1][1], eco_datas[2][1])
 
-    import doctest
-    doctest.testmod()
-    import python_ta
-
-    python_ta.check_all(config={
-        'max-line-length': 120,
-        'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
-        'allowed-io': [],
-        'max-nested-blocks': 5
-    })
+    # import doctest
+    # doctest.testmod()
+    # import python_ta
+    #
+    # python_ta.check_all(config={
+    #     'max-line-length': 120,
+    #     'extra-imports': ['igraph', 'plotly.graph_objects', 'plotly.graph_objs'],
+    #     'allowed-io': [],
+    #     'max-nested-blocks': 5
+    # })
